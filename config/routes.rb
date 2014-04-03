@@ -1,4 +1,6 @@
 TallerIntegracion::Application.routes.draw do
+
+  get '/', to: 'prueba#index', :as => :root
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
