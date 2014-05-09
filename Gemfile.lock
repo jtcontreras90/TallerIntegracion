@@ -63,6 +63,7 @@ GEM
     atomic (1.1.16)
     awesome_nested_set (3.0.0.rc.3)
       activerecord (>= 4.0.0, < 5)
+    awesome_print (1.2.0)
     aws-sdk (1.27.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
@@ -268,6 +269,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   coffee-rails (~> 4.0.0)
   jbuilder (~> 1.2)
   jquery-rails
