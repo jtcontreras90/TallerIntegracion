@@ -11,7 +11,7 @@ class Pedido < ActiveRecord::Base
         #puts file.name
         pedidoID=file.name.split('_')[1].to_i
         if file.name!=".." and file.name!="."
-          #if Time.at(file.attributes.mtime)>revision
+          if Time.at(file.attributes.mtime)>revision
             raw =sftp.download!("Pedidos/"+file.name)
             doc = Document.new(raw)
             fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
@@ -27,7 +27,7 @@ class Pedido < ActiveRecord::Base
               pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad)
               pedido.save
             end
-          #end
+          end
         end
       end
     end
