@@ -11,7 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140403231366) do
+ActiveRecord::Schema.define(version: 20140509221143) do
+
+  create_table "pedidos", force: true do |t|
+    t.datetime "fecha"
+    t.string   "rut"
+    t.date     "fechaLimite"
+    t.string   "sku"
+    t.float    "cantidad"
+    t.string   "unidad"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "direccionID"
+    t.integer  "pedidoID"
+  end
 
   create_table "spree_addresses", force: true do |t|
     t.string   "firstname"
