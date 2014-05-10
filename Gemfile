@@ -27,6 +27,14 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 1.2'
 
+gem 'mdb', '~> 0.3.1'
+
+gem 'dropbox-sdk', '~> 1.6.4'
+
+gem 'bson', '~> 2.2.3'
+
+gem 'mongoid', '~> 4.0.0.beta1'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
