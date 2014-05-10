@@ -6,6 +6,11 @@ TallerIntegracion::Application.routes.draw do
   #
   # We ask that you don't use the :as option here, as Spree relies on it being the default of "spree"
   mount Spree::Core::Engine, :at => '/'
+
+  scope :path => "/api" do
+    get "/disponibles/:username/:password/:sku" => "api#preguntarStock" #Me permite obtener el stock disponible
+    post  "/pedirProducto"  => "api#enviarProducto" #Me permite enviar producto a la bodega dada
+  end
         
   #get '/', to: 'prueba#index', :as => :root
   # The priority is based upon order of creation: first created -> highest priority.
