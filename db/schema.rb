@@ -26,7 +26,10 @@ ActiveRecord::Schema.define(version: 20140510190138) do
     t.integer  "pedidoID"
   end
 
-  create_table "reservas", force: true do |t|
+  create_table "bodegas", force: true do |t|
+    t.string   "name"
+    t.string   "password"
+    t.string   "url"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -362,6 +365,7 @@ ActiveRecord::Schema.define(version: 20140510190138) do
     t.integer  "shipping_category_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "normal_price"
   end
 
   add_index "spree_products", ["available_on"], name: "index_spree_products_on_available_on"

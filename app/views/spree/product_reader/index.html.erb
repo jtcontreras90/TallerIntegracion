@@ -1,0 +1,67 @@
+<script>
+	$(function(){
+
+		var importAProduct=function(i,data){
+			console.log (i + " : " + data.length)
+			if(i<data.length)
+			{
+				$('#avance').children().first().html(parseInt(i/(data.length-1)*100));
+				datos=data[i];
+				$.ajax({
+					url: '<%= admin_import_path %>',
+					data: datos,
+					type: 'POST',
+					success: function(_data){
+						importAProduct(i+1,data);
+					}
+				});
+			}
+		}
+
+		$("#send").click(function(){
+			file=$("#fileImport").val();
+			if(file.substring(file.length-5,file.length).toUpperCase()==".JSON")
+			{
+				var superFile = new FormData();
+				$.each($('#fileImport')[0].files, function(i, file) {
+				    superFile.append('file-'+i, file);
+				});
+
+				$('#error').html('');
+				$('#send').hide();
+				$('#loading').show();
+				$('#avance').show();
+				$('#avance').children().first().html('0');
+				$.ajax({
+					url: '<%= admin_import_file_path%>',
+					data: superFile,
+					type: 'POST',
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: function(data){
+						importAProduct(0,data);
+					}
+
+				})
+			}
+			else
+			{
+				$('#error').html('Debe ingresar un archivo válido (formato json)')
+			}
+		})
+
+	});
+</script>
+<style>
+	#error{
+		color:#a94442 !important;
+	}
+</style>
+<h1>Import masivo de productos</h1>
+<br><br>
+  <%= file_field_tag :fileImport, accept: 'application/json' %>
+ <br><br><br><br>
+  <%= submit_tag "Importar", id: "send" %><div id="error"></div>
+  <%= image_tag "loading.gif", size: "50x50", id: "loading", style: "display:none;" %>
+  <div id="avance" style="display:none;">Cargando (<span></span>%)</div>
