@@ -51,3 +51,7 @@ gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git
 gem 'money', '6.0.1'
 
 gem 'awesome_print'
+#gemas para el servidor sftp
+gem 'net-sftp'
+gem 'whenever', :require => false
+#fin de gemas servidor sftp
