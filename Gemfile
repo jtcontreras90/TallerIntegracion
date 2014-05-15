@@ -51,3 +51,6 @@ gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git
 gem 'money', '6.0.1'
 
 gem 'awesome_print'
+
+# realizar request API REST
+gem 'rest_client'
