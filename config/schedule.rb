@@ -21,4 +21,5 @@
 
 every 10.minutes do
   runner "Pedido.cargar"
+  runner "Pedido.preguntarPedidosPendientes"
 end

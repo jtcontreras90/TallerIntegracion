@@ -32,4 +32,23 @@ class Pedido < ActiveRecord::Base
       end
     end
   end
+  def self.preguntarPedidosPendientes
+    Pedido.all.each do |pedido|
+      if pedido.fechaLimite<DateTime.now()
+        pedido.destroyck
+        #TODO: generar reporte de quiebre de stock
+      else
+        reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
+        reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
+        if pedido.cantidad<[Bodega.getCantidad(pedido.sku)-reservadosTotales,0].max+reservadosCliente
+          #Vender el producto
+          if pedido.cantidad<reservadosCliente
+            Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,pedido.cantidad)
+          else
+            Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,pedido.cantidad)
+          end
+        end
+      end 
+    end
+  end
 end
