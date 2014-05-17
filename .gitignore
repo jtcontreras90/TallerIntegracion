@@ -10,6 +10,7 @@ capybara-*.html
 /log/*
 /tmp/*
 /db/*.sqlite3
+/db/schema.rb
 /public/*
 /coverage/
 /spec/tmp/*
@@ -17,4 +18,3 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 .project
-config/initializers/secret_token.rb

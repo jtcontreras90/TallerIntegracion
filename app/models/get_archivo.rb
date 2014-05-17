@@ -10,7 +10,7 @@ class Database
 		puts "Hola"
 		database = Mdb.open(dest)
 		# puts "#{database}"
-		# puts "#{database.tables}"
+		puts "#{database.tables}"
 
 		pricing= database.read("Pricing")
 		# pricing.each do |i|
@@ -59,8 +59,8 @@ ACCESS_TYPE = :dropbox
 
 
 #Luego el código para leerlo
-src = "/Grupo9/DBPrecios.accdb" #poner path del archivo en dropbox
-dest = "DBPrecios.accdb" #poner nombre del archivo a guardar (o path)
+src = "/Grupo9/DBPrecios.mdb" #poner path del archivo en dropbox
+dest = "DBPrecios.mdb" #poner nombre del archivo a guardar (o path)
 puts "src: " + src
 out = @client.get_file('/' + src)
 open(dest, 'w'){|f| f.puts out }
