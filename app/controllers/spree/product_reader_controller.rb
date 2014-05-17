@@ -10,13 +10,17 @@ module Spree
 		end
 
 		def upload
+			var={}
 			m=Spree::Taxonomy.where(name: "Marca").first.id
 			c=Spree::Taxonomy.where(name: "Categoría").first.id
 			mt=Spree::Taxon.where(name: "Marca", taxonomy_id: m).first.id
 			ct=Spree::Taxon.where(name: "Categoría", taxonomy_id: c).first.id
 
-			p= Spree::Variant.where(sku: params[:sku]).first
-			if not p
+			v= Spree::Variant.where(sku: params[:sku]).first
+			if (v and not v.product) or not v
+				if v
+					v.delete
+				end
 				p=Spree::Product.new
 				p.name=params[:modelo]
 				p.sku=params[:sku]
@@ -26,26 +30,51 @@ module Spree
 				p.tax_category_id=1
 				p.shipping_category_id=1
 				p.normal_price=params[:precio][:normal]
-
-				t=Spree::Taxon.where(name: params[:marca]).first
-				if not t
-					t=Spree::Taxon.create(name: params[:marca], parent_id: mt, taxonomy_id: m)
+				if p.save
+					i=Spree::Image.create({:attachment => open(URI.parse(params[:imagen])),:viewable => p.master})
+					var['product']=1
+				else
+					var['product']=-1
 				end
+			else
+				var['product']=0
+			end
+
+			t=Spree::Taxon.where(name: params[:marca]).first
+			if not t
+				t=Spree::Taxon.create(name: params[:marca], parent_id: mt, taxonomy_id: m)
+				if t
+					var['marca']=1
+				else
+					var['marca']=-1
+				end
+			else
+				var['marca']=0
+			end
+
+			if t and p and not t.products.where(product: p)
 				p.taxons << t
+				p.save
+			end
 
-				
-
-				params[:categorias].each do |cat|
-					t=Spree::Taxon.where(name: cat).first
-					if not t
-						t=Spree::Taxon.create(name: cat, parent_id: ct, taxonomy_id: c)
+			var['categorias']=[]
+			params[:categorias].each do |cat|
+				t=Spree::Taxon.where(name: cat).first
+				if not t
+					t=Spree::Taxon.create(name: cat, parent_id: ct, taxonomy_id: c)
+					if t
+						var['categorias']<<{name: cat, categoria: 1 }
+					else
+						var['categorias']<<{name: cat, categoria: -1 }					
 					end
-					p.taxons << t
+				else
+					var['categorias']<<{name: cat, categoria: 0 }
 				end
 
-				p.save
-
-				i=Spree::Image.create!({:attachment => open(URI.parse(params[:imagen])),:viewable => p.master})
+				if t and p and not t.products.where(product: p)
+					p.taxons << t
+					p.save
+				end
 			end
 
 
@@ -60,7 +89,7 @@ module Spree
 			# 	puts "\t #{c}"
 			# end
 
-		  	render json: "OK".to_json
+		  	render json: var.to_json
 		end
 
 	end
