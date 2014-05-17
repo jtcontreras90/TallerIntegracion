@@ -1,4 +1,4 @@
-#README
+﻿#README
 #para leer un archivo desde dropbox y guardarlo ejecutar el código siguiente
 #Primero importar librerias pertinentes
 require 'dropbox_sdk'
