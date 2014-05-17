@@ -1,23 +1,22 @@
 <script>
 	$(function(){
 
-		var importAProduct=function(i,data){
-			// console.log (i + " : " + data.length)
-			if(i<data.length && i<50)
+		var importAProduct=function(i,data,dataAct){
+			if(i<data.length)
 			{
 				$('#avance').children().first().html(parseInt(i/(data.length-1)*100));
-				datos=data[i];
 				$.ajax({
 					url: '<%= admin_import_path %>',
-					data: datos,
+					data: dataAct,
 					type: 'POST',
 					success: function(_data){
-						$('#resultado ul').append('<li id="#'+data[i]['sku']+'" class="state-'+_data['product']+'"><b>'+data[i]['modelo']+'('+data[i]['marca']+')</b></li>');
-						console.log(data[i]['sku']+": Marca "+data[i]['marca']+"("+_data['marca']+")");
-						$.each(_data['categorias'], function(i,e){
-							console.log(data[i]['sku']+": Categoría: "+e['name']+ "("+e['categoria']+")");
+						$('#resultado ul').append('<li id="#'+dataAct['sku']+'" class="state-'+_data['product']+'"><b>'+dataAct['modelo']+'('+dataAct['marca']+')</b></li>');
+						console.log(dataAct['sku']+": Marca "+dataAct['marca']+"("+_data['marca']+")");
+						$.each(_data['categorias'], function(ii,e){
+							console.log(dataAct['sku']+": Categoría: "+e['name']+ "("+e['categoria']+")");
 						});
-						importAProduct(i+1,data);
+						if (i+1<data.length)
+							importAProduct(i+1,data,_data[i+1]);
 					}
 				});
 			}
@@ -46,7 +45,7 @@
 					contentType: false,
 					processData: false,
 					success: function(data){
-						importAProduct(0,data);
+						importAProduct(0,data,data[0]);
 					}
 
 				})
