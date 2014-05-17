@@ -12,7 +12,7 @@
 					data: datos,
 					type: 'POST',
 					success: function(_data){
-						$('#resultado ul').append('<li><ul id="#'+data[i]['sku']+'" class="state-'+_data['product']+'"><b>'+data[i]['modelo']+'('+data[i]['marca']+')</b></ul></li>');
+						$('#resultado ul').append('<li id="#'+data[i]['sku']+'" class="state-'+_data['product']+'"><b>'+data[i]['modelo']+'('+data[i]['marca']+')</b></li>');
 						console.log(data[i]['sku']+": Marca "+data[i]['marca']+"("+_data['marca']+")");
 						$.each(_data['categorias'], function(i,e){
 							console.log(data[i]['sku']+": Categoría: "+e['name']+ "("+e['categoria']+")");
