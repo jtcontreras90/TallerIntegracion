@@ -43,29 +43,29 @@ class Database
 end
 
 #Iniciar la sesión
-APP_KEY = "gwxgw4dfw8p4n8q"
-APP_SECRET = "smokt05md0m4q5n"
-ACCESS_TYPE = :dropbox
+# APP_KEY = "gwxgw4dfw8p4n8q"
+# APP_SECRET = "smokt05md0m4q5n"
+# ACCESS_TYPE = :dropbox
 
-@session = DropboxSession.new(APP_KEY, APP_SECRET)
-@client = nil
+# @session = DropboxSession.new(APP_KEY, APP_SECRET)
+# @client = nil
 
-#Setear los tokens
-@session.set_access_token('mkvfcevi7josno9v','7pu9jl9t8c77yg0')
+# #Setear los tokens
+# @session.set_access_token('mkvfcevi7josno9v','7pu9jl9t8c77yg0')
 
-#Generar una clase DropboxClient (ver archivo dopbox_sdk.rb)
-@client = DropboxClient.new(@session, ACCESS_TYPE)
+# #Generar una clase DropboxClient (ver archivo dopbox_sdk.rb)
+# @client = DropboxClient.new(@session, ACCESS_TYPE)
 
 
 
-#Luego el código para leerlo
-src = "/Grupo9/DBPrecios.mdb" #poner path del archivo en dropbox
-dest = "DBPrecios.mdb" #poner nombre del archivo a guardar (o path)
-puts "src: " + src
-out = @client.get_file('/' + src)
-open(dest, 'w'){|f| f.puts out }
-puts "wrote file #{dest}."
+# #Luego el código para leerlo
+# src = "/Grupo9/DBPrecios.mdb" #poner path del archivo en dropbox
+# dest = "DBPrecios.mdb" #poner nombre del archivo a guardar (o path)
+# puts "src: " + src
+# out = @client.get_file('/' + src)
+# open(dest, 'w'){|f| f.puts out }
+# puts "wrote file #{dest}."
 
-Database.prueba(dest)
+# Database.prueba(dest)
 
 
