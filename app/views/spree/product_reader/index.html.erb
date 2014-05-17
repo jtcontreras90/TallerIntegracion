@@ -2,8 +2,8 @@
 	$(function(){
 
 		var importAProduct=function(i,data){
-			console.log (i + " : " + data.length)
-			if(i<data.length)
+			// console.log (i + " : " + data.length)
+			if(i<data.length && i<50)
 			{
 				$('#avance').children().first().html(parseInt(i/(data.length-1)*100));
 				datos=data[i];
@@ -12,6 +12,13 @@
 					data: datos,
 					type: 'POST',
 					success: function(_data){
+						$('#resultado ul').append('<li><ul id="#'+data[i]['sku']+'" class="state-'+_data['product']+'"><b>'+data[i]['modelo']+'('+data[i]['marca']+')</b></ul></li>');
+						if(_data['marca']==-1 || _data['marca']==1)
+							$('#'+data[i]['sku']).append('<li class="state-'+_data['marca']+'">Marca:'+data[i]['marca']+'</li>');
+						$.each(_data['categorias'], function(i,e){
+							if(e['categoria']==-1 || e['categoria']==1)
+								$('#'+data[i]['sku']).append('<li class="state-'+e['categoria']+'">Categoría:'+e['name']+'</li>');
+						});
 						importAProduct(i+1,data);
 					}
 				});
@@ -32,6 +39,7 @@
 				$('#loading').show();
 				$('#avance').show();
 				$('#avance').children().first().html('0');
+				$('#resultado').show();
 				$.ajax({
 					url: '<%= admin_import_file_path%>',
 					data: superFile,
@@ -54,8 +62,47 @@
 	});
 </script>
 <style>
-	#error{
+	#error,.error, .state--1{
 		color:#a94442 !important;
+	}
+	#succes, .success, .state-1{
+		color: #3c763d !important;
+	}
+	#warning, .warning, .state-0{
+		color: #8a6d3b !important;
+	}
+	.well{
+		min-height: 20px;
+		padding: 19px;
+		margin-bottom: 20px;
+		background-color: #f5f5f5;
+		border: 1px solid #e3e3e3;
+		border-radius: 4px;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+	}
+	.well-lg{
+		padding: 24px;
+		border-radius: 6px;
+	}
+
+	#resultado li {
+		display: list-item;
+		text-align: -webkit-match-parent;
+	}
+	#resultado ul {
+		display: block;
+		list-style-type: disc;
+		-webkit-margin-before: 1em;
+		-webkit-margin-after: 1em;
+		-webkit-margin-start: 0px;
+		-webkit-margin-end: 0px;
+		-webkit-padding-start: 40px;
+	}
+
+	#resultado ul, ol {
+		margin-top: 0;
+		margin-bottom: 10px;
 	}
 </style>
 <h1>Import masivo de productos</h1>
@@ -65,3 +112,4 @@
   <%= submit_tag "Importar", id: "send" %><div id="error"></div>
   <%= image_tag "loading.gif", size: "50x50", id: "loading", style: "display:none;" %>
   <div id="avance" style="display:none;">Cargando (<span></span>%)</div>
+  <div id="resultado" class="well well-lg" style="display:none;"><ul></ul></div>
