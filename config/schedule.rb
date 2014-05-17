@@ -16,10 +16,16 @@
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"
 # end
-
 # Learn more: http://github.com/javan/whenever
 
 every 10.minutes do
   runner "Pedido.cargar"
   runner "Pedido.preguntarPedidosPendientes"
+end
+
+every 1.hour do
+	runner "ApiBodega.vaciarBodegaRecepcion"
+end
+every 1.hour do
+	runner "ApiBodega.vaciarBodegaPulmon"
 end
