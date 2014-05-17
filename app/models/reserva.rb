@@ -18,7 +18,6 @@ class Reserva < ActiveRecord::Base
       row=row+1
       celda=ws[row,1]
     end
-    puts reservas
     return reservas
   end
   def self.getReservasXCliente(sku,rut)
@@ -38,7 +37,6 @@ class Reserva < ActiveRecord::Base
       row=row+1
       celda=ws[row,1]
     end
-    puts reservas
     return reservas
   end
   def self.quitarReservasXCliente(sku,rut,cantidad)

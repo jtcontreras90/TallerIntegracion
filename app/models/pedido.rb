@@ -40,13 +40,9 @@ class Pedido < ActiveRecord::Base
       else
         reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
         reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
-        if pedido.cantidad<[Bodega.getCantidad(pedido.sku)-reservadosTotales,0].max+reservadosCliente
+        if pedido.cantidad<Bodega.obtenerStock(pedido.sku) and pedido.cantidad<[Bodega.obtenerStock(pedido.sku)-reservadosTotales,0].max+reservadosCliente 
           #Vender el producto
-          if pedido.cantidad<reservadosCliente
-            Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,pedido.cantidad)
-          else
-            Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,pedido.cantidad)
-          end
+          Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
         end
       end 
     end
