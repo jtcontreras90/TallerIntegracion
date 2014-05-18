@@ -11,7 +11,6 @@ class Vtiger
 	@sessName=''
 
 	def initialize
-		puts "entra"
 		begin
 			login
 		rescue
@@ -22,6 +21,24 @@ class Vtiger
 	#Se deslogea
 	def logout
 		apiconect("logout",:get,"&sessionName=#{@sessName}")
+	end
+	
+	def direccionByRutAndDireccionId(rut,direccion_id)
+	   account=findAccountByRut(rut)
+	   if account
+	     contacts=findContactsFromAccount(account['id'])
+	     direccion=false
+	     if contacts
+          contacts.each do |c|
+            if "#{c['cf_707']}"=="#{direccion_id}"
+            direccion = {'calle' => c['otherstreet'], 'ciudad' => c['othercity'], 'region' => c['otherstate']}
+            end
+          end
+       end
+       direccion
+	   else
+	     false
+	   end
 	end
 
 	def findAccountByRut(rut)
