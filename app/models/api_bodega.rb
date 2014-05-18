@@ -269,11 +269,11 @@ class ApiBodega < ActiveRecord::Base
 		#intenta vaciar la bodega pulmon moviendo los productos a las dos bodegas centrales
 	def self.vaciarBodegaPulmon
 		begin
-			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d132')
+			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
 			skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d132', i["_id"])
+					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -285,11 +285,11 @@ class ApiBodega < ActiveRecord::Base
 			end	
 		rescue Exception => e
 			begin
-				skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d132')
+				skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
 				skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d132', i["_id"])
+					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -309,6 +309,36 @@ class ApiBodega < ActiveRecord::Base
 		end
 		
 	end
+	# suma los costos de todos los productos de la bodega pulmon 
+	def self.reportarBPulmonDw
+		#costo diario de la bodega
+		costoDia=0
+		skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
+			skus.each do |i|
+				j=0
+				while j<i["total"]
+					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+					productos.each do |k|
+						if j<i["total"]
+							
+							costoDia=ApiBodega.moverProductoBodegaCentra1(k["costo"])+costoDia
+							j=j+1
+						end
+					end
+				end
+			end	
+			#fecha que se reporta al datawerehouse
+			time = Time.now
+			fecha=time.inspect
+			#cantidad total de productos en la bodegaPulmon
+			almacenes=getAlmacenes
+			cantTotal= almacenes[3]["usedSpace"] 
+
+			#falta el comando para reportar al DW
+		
+	end
+
+
 
 	def self.run
 		#Bodega de recepción
@@ -318,7 +348,10 @@ class ApiBodega < ActiveRecord::Base
 		# ApiBodega.getSkusWithStock("53571e54682f95b80b786eba")
 		# ApiBodega.despacharStock('53571e55682f95b80b7899aa', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
 		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		
+		
 
+		reportarBPulmonDw
 		#ApiBodega.getAlmacenes()
 		#ApiBodega.moverProductosBodegaRecepcion('3517982', 5)
 		#ApiBodega.getAlmacenes()
@@ -340,6 +373,7 @@ class ApiBodega < ActiveRecord::Base
 		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
 		# ApiBodega.despacharStock('53571e55682f95b80b789997', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
 	
+
 	end
 
 end

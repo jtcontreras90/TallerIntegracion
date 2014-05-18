@@ -25,4 +25,8 @@ every 1.hour do
 	runner "ApiBodega.vaciarBodegaPulmon"
 end
 
+every 1.day do
+	runner "ApiBodega.reportarBPulmonDw"
+end
+
 # Learn more: http://github.com/javan/whenever
