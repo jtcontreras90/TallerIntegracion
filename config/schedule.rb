@@ -34,9 +34,7 @@ end
  	runner "Database.readcsv"
  end
 
-
 every 1.day do
 	runner "ApiBodega.reportarBPulmonDw"
 end
 
-# Learn more: http://github.com/javan/whenever
