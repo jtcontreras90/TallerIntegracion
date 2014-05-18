@@ -40,12 +40,9 @@ group :doc do
   gem 'sdoc', require: false
 end
 
-<<<<<<< HEAD
 gem 'google_drive'
-=======
 
 gem 'whenever', require: false
->>>>>>> 0671b2546b44f0f28135563c80ffd4a9267a9fc2
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -66,7 +63,6 @@ gem 'money', '6.0.1'
 
 gem 'awesome_print'
 
-<<<<<<< HEAD
 #gemas para el servidor sftp
 gem 'net-sftp'
 gem 'whenever', :require => false
@@ -74,7 +70,3 @@ gem 'whenever', :require => false
 
 #Facilita la conexión con cualquier API
 gem 'rest-client'
-=======
-# realizar request API REST
-gem 'rest_client'
->>>>>>> 0671b2546b44f0f28135563c80ffd4a9267a9fc2

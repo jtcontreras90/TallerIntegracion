@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  utilidad: 1
+  ingreso: 1
+  cantidad: 1
+  rutCliente: MyString
+  sku: MyString
+  fecha: 2014-05-17 18:33:11
+
+two:
+  utilidad: 1
+  ingreso: 1
+  cantidad: 1
+  rutCliente: MyString
+  sku: MyString
+  fecha: 2014-05-17 18:33:11
