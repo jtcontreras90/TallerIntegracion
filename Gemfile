@@ -41,6 +41,7 @@ group :doc do
 end
 
 gem 'google_drive'
+
 gem 'whenever', require: false
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -68,4 +69,3 @@ gem 'net-sftp'
 
 #Facilita la conexión con cualquier API
 gem 'rest-client'
-
