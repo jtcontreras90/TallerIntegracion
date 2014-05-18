@@ -154,23 +154,24 @@ class ApiBodega < ActiveRecord::Base
 	def self.moverProductosBodegaDespacho(sku, cantidad)
 		i = 0
 		almacenes=ApiBodega.getAlmacenes
-		while i < cantidad do
-   			almacenes.each do |j|
-   				productos=ApiBodega.getStock(j["_id"],sku)
-   				productos.each	do |k|
-   					if i<cantidad and j["_id"]!='53571e54682f95b80b786eba'
-   						ApiBodega.moverProductoBodegaDespacho(k["_id"])
-   						i=i+1 
-   					end
-   				end
-   			end
+		#while i < cantidad do
+		almacenes.each do |j|
+			productos=ApiBodega.getStock(j["_id"],sku)
+			productos.each	do |k|
+				if i<cantidad and j["_id"]!='53571e54682f95b80b786eba'
+					ApiBodega.moverProductoBodegaDespacho(k["_id"])
+					i=i+1 
+				end
+			end
 		end
+		#end
+		i
 	end
 	# mueve todos los productos solicitados a la bodega de Recepcion, dado un sku y una cantidad
 	def self.moverProductosBodegaRecepcion(sku, cantidad)
 		i = 0
 		almacenes=ApiBodega.getAlmacenes
-		while i < cantidad do
+		# while i < cantidad do
    			almacenes.each do |j|
    				productos=ApiBodega.getStock(j["_id"],sku)
    				productos.each	do |k|
@@ -180,31 +181,40 @@ class ApiBodega < ActiveRecord::Base
    					end
    				end
    			end
-		end
+		# end
+		i
 	end
 
 
 	#despacho otras bodegas dado el almacen de recepción de otro grupo, el sku y la cantidad. 
 	def self.despacharOtrasBodegas(almacenId,sku,cantidad)
+		puts "Empezando todo"
 		ApiBodega.moverProductosBodegaDespacho(sku, cantidad)
+		puts "Pasa por aquí"
 		i = 0
-		while i< cantidad do
-			productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
-			productos.each do |j|
-				if i<cantidad 
-   						ApiBodega.moverStockBodega(almacenId,j["_id"])
+		j = 0
+		productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
+		#while i< cantidad do
+			productos.each_with_index do |element,index|
+				puts "Cantidad enviada actual: #{i}"
+				if i<cantidad and index >= j #
+						puts "Tratará de enviar el producto #{element["_id"]} a #{almacenId}"
+   						ApiBodega.moverStockBodega(almacenId,element["_id"])
    						i=i+1 
+   						j=j+1
+
    				end
 			end	
 
-		end	
+		#end
+		i	
 
 	end
 	# depachar productos a un cliente dado el sku y la cantidad, precio, dirección, pedido id
 	def self.despacharProducto(sku, cantidad, direccion,precio,pedidoId)
 		ApiBodega.moverProductosBodegaDespacho(sku, cantidad)
-				i = 0
-		while i< cantidad do
+		i = 0
+		#while i< cantidad do
 			productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
 			productos.each do |j|
 				if i<cantidad 
@@ -213,7 +223,7 @@ class ApiBodega < ActiveRecord::Base
    				end
 			end	
 
-		end	
+		#end	
 	end
 
 	#intenta vaciar la bodega de recepción moviendo los productos a las dos bodegas centrales
