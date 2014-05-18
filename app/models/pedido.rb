@@ -49,7 +49,6 @@ class Pedido < ActiveRecord::Base
         pedido.save
         #pedido.destroy()
         else
-          puts "Llego aqui"
           reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
           reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
           if pedido.cantidad<ApiBodega.obtenerStock(pedido.sku) and pedido.cantidad<[ApiBodega.obtenerStock(pedido.sku)-reservadosTotales,0].max+reservadosCliente
@@ -62,9 +61,11 @@ class Pedido < ActiveRecord::Base
             :fecha=>DateTime.now())
             venta.save
             Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
+            vtiger=Vtiger.new
+            direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
+            ApiBodega.despacharProducto(pedido.sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], 0, pedido.id)
             pedido.enviado=true
             pedido.save
-            puts "incluso termino"
           #pedido.destroy()
           end
         end
