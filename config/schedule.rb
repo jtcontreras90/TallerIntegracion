@@ -29,3 +29,11 @@ end
 every 1.hour do
 	runner "ApiBodega.vaciarBodegaPulmon"
 end
+
+ every 2.hours do
+ 	runner "Database.accdb_to_csv"
+ end
+
+ every 1.hours do
+ 	runner "Database.readcsv"
+ end
