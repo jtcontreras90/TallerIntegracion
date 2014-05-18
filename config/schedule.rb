@@ -30,7 +30,11 @@ every 1.hour do
 	runner "ApiBodega.vaciarBodegaPulmon"
 end
 
-
  every 1.hours do
  	runner "Database.readcsv"
  end
+
+every 1.day do
+	runner "ApiBodega.reportarBPulmonDw"
+end
+
