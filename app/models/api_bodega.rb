@@ -334,11 +334,13 @@ class ApiBodega < ActiveRecord::Base
 			#fecha que se reporta al datawerehouse
 			time = Time.now
 			fecha=time.inspect
+			puts fecha
 			#cantidad total de productos en la bodegaPulmon
 			almacenes=getAlmacenes
 			cantTotal= almacenes[3]["usedSpace"] 
 
-			#falta el comando para reportar al DW
+			Costobodegapulmon.agregar(costoDia, fecha,cantTotal)
+
 		
 	end
 
@@ -355,8 +357,8 @@ class ApiBodega < ActiveRecord::Base
 		
 		
 
-		reportarBPulmonDw
-		#ApiBodega.getAlmacenes()
+		#reportarBPulmonDw
+		ApiBodega.getAlmacenes()
 		#ApiBodega.moverProductosBodegaRecepcion('3517982', 5)
 		#ApiBodega.getAlmacenes()
 		#ApiBodega.vaciarBodegaRecepcion()
