@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140515171244) do
+ActiveRecord::Schema.define(version: 20140518020324) do
 
   create_table "bodegas", force: true do |t|
     t.string   "name"
@@ -32,6 +32,21 @@ ActiveRecord::Schema.define(version: 20140515171244) do
     t.datetime "updated_at"
     t.integer  "direccionID"
     t.integer  "pedidoID"
+    t.boolean  "enviado"
+    t.boolean  "quebrado"
+  end
+
+  create_table "pricings", force: true do |t|
+    t.integer  "precio"
+    t.date     "fecha_actualizacion"
+    t.date     "fecha_vigencia"
+    t.integer  "costo_producto"
+    t.integer  "costo_traspaso"
+    t.integer  "costo_almacenaje"
+    t.string   "sku"
+    t.integer  "id_pricing"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "reservas", force: true do |t|
@@ -781,5 +796,17 @@ ActiveRecord::Schema.define(version: 20140515171244) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "venta", force: true do |t|
+    t.integer  "utilidad"
+    t.integer  "ingreso"
+    t.datetime "fecha"
+    t.integer  "spree_variant_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "pedido_id"
+  end
+
+  add_index "venta", ["pedido_id"], name: "index_venta_on_pedido_id"
 
 end

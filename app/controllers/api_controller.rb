@@ -1,5 +1,7 @@
 class ApiController < ApplicationController
 
+	skip_before_filter :verify_authenticity_token  
+	#/disponibles/:username/:password/:sku
 	def preguntarStock
 		@bodega=Bodega.find_by_username(params[:username])
 		return render :json => {status: 404, message: "User Not Found"}, status: :not_found unless @bodega
@@ -8,11 +10,11 @@ class ApiController < ApplicationController
 		return render :json => {status: 404, message: "Product with SKU '#{params[:sku]}' Not Found"}, status: :not_found unless variant
 		#Si existe la variante, entonces existe el producto
 
-		#Aquí interviene Ignacio Yousef viendo la cantidad disponible de producto para el SKU dado
-		#APIBodega.GetStock(params[:SKU])
+		disponible=ApiBodega.obtenerStock(params[:sku]) #Stock del producto con el sku dado
 
-		render :json => {status: 200, response: {sku: params[:sku], cantidad: 12}}
+		render :json => {status: 200, response: {sku: params[:sku], cantidad: disponible}}
 	end
+
 
 	def enviarProducto
 		@bodega=Bodega.find_by_username(params[:username])
@@ -21,16 +23,13 @@ class ApiController < ApplicationController
 		variant=Spree::Variant.find_by_sku(params[:sku])
 		return render :json => {status: 404, message: "Product with SKU '#{params[:sku]}' Not Found"}, status: :not_found unless variant
 
-		#Aquí interviene Ignacio Yousef viendo la cantidad disponible de producto para el SKU dado
-		#disponible=APIBodega.GetStock(params[:SKU])
+		disponible=ApiBodega.obtenerStock(params[:sku]) #Stock del producto con el sku dado
 
 		enviado=0
 
-		#if disponible > params[:cantidad]
-		# enviado=APIBodega.enviar(params[:SKU],params[:cantidad],params[:almacenId])
-		#else
-		# envieado=APIBodega.enviar(params[:SKU],disponible,params[:almacenId])
-		#end
+		if disponible >= params[:cantidad].to_i
+			enviado=ApiBodega.despacharOtrasBodegas(params[:almacenId],params[:sku],params[:cantidad].to_i) #Despachar a almacenId
+		end
 
 		render :json => {status: 200, response: {sku: params[:sku], cantidad: enviado}}
 
