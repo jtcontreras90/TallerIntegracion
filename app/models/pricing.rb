@@ -1,13 +1,24 @@
 class Pricing < ActiveRecord::Base
 	
 	 def self.findBySKU(sku)
-	 	puts Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).inspect
-	 	return Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).inspect
+
+	 	p=Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)
+	 	if p
+	 		puts p.inspect
+	 		return p.inspect
+	 	else
+	 		return p
+	 	end
 	 end
 
 	 def self.findById(id)
-	 	puts Pricing.where("id_pricing = ? and fecha_actualizacion <= ? and fecha_vigencia > ?",id,DateTime.now,DateTime.now).inspect
-	 	return Pricing.where("id_pricing = ? and fecha_actualizacion <= ? and fecha_vigencia > ?",id,DateTime.now,DateTime.now).inspect
+	 	p= Pricing.where("id_pricing = ? and fecha_actualizacion <= ? and fecha_vigencia > ?",id,DateTime.now,DateTime.now)
+	 	if p
+	 		puts p.inspect
+	 		return p.inspect
+	 	else
+	 		return p
+	 	end
 	 end
 
 	 def self.precioBySKU(sku)
@@ -22,9 +33,14 @@ class Pricing < ActiveRecord::Base
 	 end
 
 	 def self.precioTransferenciaBySKU(sku)
-	 	costo = Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)[0].costo_traspaso
-	 	puts costo
-		return costo
+	 	p = Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).first
+	 	if p
+	 		costo= p.costo_traspaso
+		 	puts costo
+			return costo
+		else
+			return 0
+		end
 	 	
 	 end
 
