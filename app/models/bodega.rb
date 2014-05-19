@@ -1,7 +1,7 @@
 ﻿class Bodega < ActiveRecord::Base
 
 	has_many :transferencias
-
+  require 'rest_client'
 	require 'json'
 
 	def self.find_by_username(username)
@@ -18,7 +18,36 @@
     	Rails.logger.info "[SCHEDULE][BODEGA.ENVIARPRODUCTO]Finish at #{Time.now}"
 	end
 
-	def self.pedirProducto
-		
-	end
+	def self.pedirProducto(sku,cantidad)
+	  for i in 1..8
+      case i
+      when 1
+      when 2
+      when 3
+      when 4
+        url="http://integra4.ing.puc.cl/api/pedirProducto"
+        user="grupo9"
+        pass="795f5a03cad01447898fb5861de0d0af6115b0c1"
+        almacenId="53571e54682f95b80b786eb9"
+        response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
+        if not JSON.parse(response.body).has_key?('error')
+          cantidad=0
+          break
+        end
+      when 5
+        url="http://integra5.ing.puc.cl:8080/api/v1/pedirProducto"
+        user="grupo9"
+        pass="JgS9I4od03"
+        almacenId="53571e54682f95b80b786eb9"
+        response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad }
+        if not JSON.parse(response.body).has_key?('error')
+          cantidad=0
+          break
+        end
+      when 6
+      when 7
+      when 8
+      end
+    end
+  end
 end

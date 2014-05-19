@@ -4,7 +4,6 @@ class Pricing < ActiveRecord::Base
 
 	 	p=Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)
 	 	if p
-	 		puts p.inspect
 	 		return p.inspect
 	 	else
 	 		return p
@@ -41,7 +40,6 @@ class Pricing < ActiveRecord::Base
 		else
 			return 0
 		end
-	 	
 	 end
 
 end
