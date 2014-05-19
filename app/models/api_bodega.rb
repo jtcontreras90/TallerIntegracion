@@ -116,10 +116,13 @@ class ApiBodega < ActiveRecord::Base
 			end	
 				
 		end
-		puts total
-
+		#Corresponde a los productos que pidieron otras bodegas pero que aún no se han enviado
+		yaEnviado=Transferencia.where(sku: sku, sent: false).sum(:cantidad)
+		total=total-yaEnviado
+		if total < 0
+			total=0
+		end
 		total
-
 	end
 	# retorna un bool dependiendo si existe la cantidad de producto solicitada. 
 	def self.validarStock(sku,cantidad)
