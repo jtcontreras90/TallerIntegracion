@@ -82,6 +82,7 @@ class Database
     end
 
     def self.readcsv
+    	Rails.logger.info "[SCHEDULE][DATABASE.READCSV]Begin at #{Time.now}"
     	@session = DropboxSession.new(@@APP_KEY, @@APP_SECRET)
 		@client = nil
 
@@ -122,8 +123,8 @@ class Database
 		  	p.save
 		  	end
 		  	i=i+1
-		end		
-
+		end
+    	Rails.logger.info "[SCHEDULE][DATABASE.READCSV]Finish at #{Time.now}"
     end
 
 end
