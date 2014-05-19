@@ -27,7 +27,7 @@ class Pedido < ActiveRecord::Base
             if vtiger.direccionByRutAndDireccionId(rut,direccionID)
               fechaLimite=Date.parse(doc.elements['xml/Pedidos/fecha'].text)
               doc.elements.each("xml/Pedidos/Pedido") do | element|
-                sku=element.elements['sku'].text
+                sku=element.elements['sku'].text.strip
                 unidad=element.elements['cantidad'].attributes['unidad']
                 cantidad=element.elements['cantidad'].text.to_f
                 pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false)
@@ -53,9 +53,10 @@ class Pedido < ActiveRecord::Base
         pedido.save
         #pedido.destroy()
         else
-          reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
-          reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
-          stockDisponible=ApiBodega.obtenerStock("#{pedido.sku}")
+          sku=pedido.sku.strip
+          reservadosTotales=Reserva.getReservasXSKU(sku)
+          reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
+          stockDisponible=ApiBodega.obtenerStock(sku)
           puts "Sku: #{pedido.sku}"
           puts "Cantidad pedida: #{pedido.cantidad}"
           puts "Cantidad disponible: #{stockDisponible}"
@@ -64,17 +65,17 @@ class Pedido < ActiveRecord::Base
           puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
           if pedido.cantidad<stockDisponible and pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente
             #Vender el producto
-            variant=Spree::Variant.where(:sku=>pedido.sku).first()
+            variant=Spree::Variant.where(sku: sku).first()
             venta=Venta.new(:spree_variant_id=>variant.id,
             :utilidad=>0,
             :ingreso=>0,
             :pedido_id=>pedido.id,
             :fecha=>DateTime.now())
             venta.save
-            Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
+            Reserva.quitarReservasXCliente(sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
             vtiger=Vtiger.new
             direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
-            ApiBodega.despacharProducto(pedido.sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], 0, pedido.id)
+            ApiBodega.despacharProducto(sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], 0, pedido.id)
             pedido.enviado=true
             pedido.save
           #pedido.destroy()
