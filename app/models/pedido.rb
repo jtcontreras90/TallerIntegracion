@@ -3,8 +3,10 @@ require 'rexml/document'
 
 include REXML
 class Pedido < ActiveRecord::Base
+
   belongs_to :venta, :class_name => "Venta", :foreign_key => 'pedido_id'
   def self.cargar
+    Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Begin at #{Time.now}"
     Net::SFTP.start('integra.ing.puc.cl','grupo9',:password=>'3045kdk') do |sftp|
       revision = (Time.now - 600)
       nombre=""
@@ -38,9 +40,11 @@ class Pedido < ActiveRecord::Base
         end
       end
     end
+    Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Finish at #{Time.now}"
   end
 
   def self.preguntarPedidosPendientes
+    Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Begin at #{Time.now}"
     Pedido.all.each do |pedido|
       if not pedido.enviado and not pedido.quebrado
         if pedido.fechaLimite<DateTime.now()
@@ -71,5 +75,6 @@ class Pedido < ActiveRecord::Base
         end
       end
     end
+    Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Finish at #{Time.now}"
   end
 end

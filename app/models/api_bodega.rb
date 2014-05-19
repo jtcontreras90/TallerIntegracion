@@ -231,6 +231,7 @@ class ApiBodega < ActiveRecord::Base
 
 	#intenta vaciar la bodega de recepción moviendo los productos a las dos bodegas centrales
 	def self.vaciarBodegaRecepcion
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Begin at #{Time.now}"
 		begin
 			skus=ApiBodega.getSkusWithStock('53571e54682f95b80b786eb9')
 			skus.each do |i|
@@ -270,11 +271,12 @@ class ApiBodega < ActiveRecord::Base
 
 			
 		end
-		
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Finish at #{Time.now}"
 	end
 
 		#intenta vaciar la bodega pulmon moviendo los productos a las dos bodegas centrales
 	def self.vaciarBodegaPulmon
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Begin at #{Time.now}"
 		begin
 			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
 			skus.each do |i|
@@ -314,36 +316,39 @@ class ApiBodega < ActiveRecord::Base
 
 			
 		end
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Finish at #{Time.now}"
 		
 	end
 	# suma los costos de todos los productos de la bodega pulmon 
 	def self.reportarBPulmonDw
 		#costo diario de la bodega
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
 		costoDia=0
 		skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
-			skus.each do |i|
-				j=0
-				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
-					productos.each do |k|
-						if j<i["total"]
-							
-							costoDia=ApiBodega.moverProductoBodegaCentra1(k["costo"])+costoDia
-							j=j+1
-						end
+		skus.each do |i|
+			j=0
+			while j<i["total"]
+				productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+				productos.each do |k|
+					if j<i["total"]
+						
+						costoDia=ApiBodega.moverProductoBodegaCentra1(k["costo"])+costoDia
+						j=j+1
 					end
 				end
-			end	
-			#fecha que se reporta al datawerehouse
-			time = Time.now
-			fecha=time.inspect
-			puts fecha
-			#cantidad total de productos en la bodegaPulmon
-			almacenes=getAlmacenes
-			cantTotal= almacenes[3]["usedSpace"] 
+			end
+		end	
+		#fecha que se reporta al datawerehouse
+		time = Time.now
+		fecha=time.inspect
+		puts fecha
+		#cantidad total de productos en la bodegaPulmon
+		almacenes=getAlmacenes
+		cantTotal= almacenes[3]["usedSpace"] 
 
-			Costobodegapulmon.agregar(costoDia, fecha,cantTotal)
+		Costobodegapulmon.agregar(costoDia, fecha,cantTotal)
 
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
 		
 	end
 
