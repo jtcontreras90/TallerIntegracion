@@ -18,23 +18,23 @@
 # end
 # Learn more: http://github.com/javan/whenever
 
-every 10.minutes do
+every 15.minutes do
   runner "Pedido.cargar"
   runner "Pedido.preguntarPedidosPendientes"
+  runner "Bodega.enviarProducto"
 end
 
-every 1.hour do
+every 3.hours do
 	runner "ApiBodega.vaciarBodegaRecepcion"
 end
-every 1.hour do
+
+every 2.hours do
 	runner "ApiBodega.vaciarBodegaPulmon"
 end
 
- every 1.hours do
- 	runner "Database.readcsv"
- end
-
-every 1.day do
+every :day, :at => '11:57pm' do
 	runner "ApiBodega.reportarBPulmonDw"
 end
-
+every :day, :at => '4:30 am' do
+	runner "Database.readcsv"
+end
