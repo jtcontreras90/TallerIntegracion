@@ -13,7 +13,7 @@ class Pedido < ActiveRecord::Base
       #puts file.name
         pedidoID=file.name.split('_')[1].to_i
         if file.name!=".." and file.name!="."
-          if Time.at(file.attributes.mtime)>revision
+          #if Time.at(file.attributes.mtime)>revision
             raw =sftp.download!("Pedidos/"+file.name)
             doc = Document.new(raw)
             fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
@@ -31,10 +31,9 @@ class Pedido < ActiveRecord::Base
                 pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false)
                 pedido.save
               end
-
             end
             vtiger.logout
-          end
+          #end
         end
       end
     end
@@ -44,26 +43,36 @@ class Pedido < ActiveRecord::Base
     Pedido.all.each do |pedido|
       if not pedido.enviado and not pedido.quebrado
         if pedido.fechaLimite<DateTime.now()
-          Quiebre.agregar(:fecha=> DateTime.now(),:sku_producto=>pedido, :rut_cliente=>pedido.rut)
-        pedido.quebrado=true
-        pedido.save
-        #pedido.destroy()
+          Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
+          pedido.quebrado=true
+          pedido.save
+          #TODO aqui hay q poner lo de pedir mas stock a los otros grupos
         else
+          puts "otro hola"
           reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
           reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
-          if pedido.cantidad<ApiBodega.obtenerStock(pedido.sku) and pedido.cantidad<[ApiBodega.obtenerStock(pedido.sku)-reservadosTotales,0].max+reservadosCliente
+          stockDisp=ApiBodega.obtenerStock(pedido.sku)
+          puts pedido.cantidad<stockDisp
+          puts pedido.cantidad
+          puts stockDisp
+          puts pedido.sku
+          puts pedido.cantidad<[stockDisp-reservadosTotales,0].max+reservadosCliente
+          if pedido.cantidad<stockDisp and pedido.cantidad<[stockDisp-reservadosTotales,0].max+reservadosCliente
             #Vender el producto
+            puts "hola"
             variant=Spree::Variant.where(:sku=>pedido.sku).first()
+            precios=Pricing.findBySKU(pedido.sku)
             venta=Venta.new(:spree_variant_id=>variant.id,
-            :utilidad=>0,
-            :ingreso=>0,
+            :utilidad=>precios['Precio']-precios['Costo Producto'],
+            :ingreso=>precios['Precio'],
             :pedido_id=>pedido.id,
             :fecha=>DateTime.now())
             venta.save
             Reserva.quitarReservasXCliente(pedido.sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
             vtiger=Vtiger.new
             direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
-            ApiBodega.despacharProducto(pedido.sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], 0, pedido.id)
+            ApiBodega.despacharProducto(pedido.sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], precios['Precio'], pedido.id)
+            vtiger.logout
             pedido.enviado=true
             pedido.save
           #pedido.destroy()

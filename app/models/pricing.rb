@@ -2,7 +2,7 @@ class Pricing < ActiveRecord::Base
 	
 	 def self.findBySKU(sku)
 	 	puts Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).inspect
-	 	return Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).inspect
+	 	return Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)
 	 end
 
 	 def self.findById(id)
@@ -12,7 +12,7 @@ class Pricing < ActiveRecord::Base
 
 	 def self.precioBySKU(sku)
 	 	puts Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)[0].precio
-			return Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)
+			return Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).first().precio
 	 end
 
 end

@@ -15,7 +15,7 @@ class ApiBodega < ActiveRecord::Base
 	def self.getAlmacenes
 		response= RestClient.get "http://bodega-integracion-2014.herokuapp.com/almacenes", {:Authorization => "UC grupo9:vdgf4m3rusH1dXghLy9yMPGL+fk="}
 		r=JSON.parse response
-		puts response
+		#puts response
 		r
 	end
 
@@ -59,7 +59,7 @@ class ApiBodega < ActiveRecord::Base
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
 		response= RestClient.post "http://bodega-integracion-2014.herokuapp.com/moveStock",{'productoId' => productoId, 'almacenId' => almacenId}, {:Authorization => "UC grupo9:#{hash}"}
-		puts response
+		#puts response
 		r=JSON.parse response
 
 		r
@@ -69,12 +69,12 @@ class ApiBodega < ActiveRecord::Base
 		#retorna el almacen y el producto. Errores: los mismos que mover stock pero incluye: producto no se encuentra en la guia de despacho. 
 	def self.moverStockBodega(almacenId, productoId)      
 		signature = "POST#{productoId}#{almacenId}"
-		puts signature
+		#puts signature
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
-		#puts hash
+		##puts hash
 		response= RestClient.post "http://bodega-integracion-2014.herokuapp.com/moveStockBodega",{'productoId' => productoId, 'almacenId' => almacenId}, {:Authorization => "UC grupo9:#{hash}"}
-		#puts response
+		##puts response
 		r=JSON.parse response
 
 		r
@@ -86,16 +86,16 @@ class ApiBodega < ActiveRecord::Base
 
 	def self.despacharStock(productoId, direccion, precio, pedidoId)
 		signature = "DELETE#{productoId}#{direccion}#{precio}#{pedidoId}"
-		puts signature
+		#puts signature
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
-		puts hash
+		#puts hash
 		#{'productoId' => productoId, 'direccion' => direccion,'precio' => precio, 'pedidoId' => pedidoId},
 		parametros={productoId: productoId,direccion: direccion,precio: precio,pedidoId: pedidoId}
 		#response= RestClient.delete "http://bodega-integracion-2014.herokuapp.com/stock?#{parametros.to_query}", {:Authorization => "UC grupo9:#{hash}"}
 		response=RestClient::Request.execute(:method => 'delete', :url => "http://bodega-integracion-2014.herokuapp.com/stock",:headers =>{:Authorization => "UC grupo9:#{hash}"}, :payload =>parametros)
 		#response= RestClient.delete 'http://bodega-integracion-2014.herokuapp.com/stock',{'Authorization' => hash,:accept => :json, :params=>{:productId=>productId, :dirección=>dirección, :precio=>precio,:pedidoId=>pedidoId}}
-		puts response
+		#puts response
 		r=JSON.parse response
 
 		r
@@ -116,7 +116,7 @@ class ApiBodega < ActiveRecord::Base
 			end	
 				
 		end
-		puts total
+		#puts total
 
 		total
 
@@ -188,17 +188,17 @@ class ApiBodega < ActiveRecord::Base
 
 	#despacho otras bodegas dado el almacen de recepción de otro grupo, el sku y la cantidad. 
 	def self.despacharOtrasBodegas(almacenId,sku,cantidad)
-		puts "Empezando todo"
+		#puts "Empezando todo"
 		ApiBodega.moverProductosBodegaDespacho(sku, cantidad)
-		puts "Pasa por aquí"
+		#puts "Pasa por aquí"
 		i = 0
 		j = 0
 		productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
 		#while i< cantidad do
 			productos.each_with_index do |element,index|
-				puts "Cantidad enviada actual: #{i}"
+				#puts "Cantidad enviada actual: #{i}"
 				if i<cantidad and index >= j #
-						puts "Tratará de enviar el producto #{element["_id"]} a #{almacenId}"
+						#puts "Tratará de enviar el producto #{element["_id"]} a #{almacenId}"
    						ApiBodega.moverStockBodega(almacenId,element["_id"])
    						i=i+1 
    						j=j+1
