@@ -55,7 +55,13 @@ class Pedido < ActiveRecord::Base
         else
           reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
           reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
-          if pedido.cantidad<ApiBodega.obtenerStock(pedido.sku) and pedido.cantidad<[ApiBodega.obtenerStock(pedido.sku)-reservadosTotales,0].max+reservadosCliente
+          stockDisponible=ApiBodega.obtenerStock(pedido.sku)
+          puts "Cantidad pedida: #{pedido.cantidad}"
+          puts "Cantidad disponible: #{stockDisponible}"
+          puts "Cantidad disponible para el cliente: #{[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
+          puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
+          puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
+          if pedido.cantidad<stockDisponible and pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente
             #Vender el producto
             variant=Spree::Variant.where(:sku=>pedido.sku).first()
             venta=Venta.new(:spree_variant_id=>variant.id,
