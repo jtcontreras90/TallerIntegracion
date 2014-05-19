@@ -25,8 +25,11 @@ class Ventaproducto
 
 	end
 
-
-	##hacer consulta para obtener productos en un determinado rango
+	##Hacer query para obtener productos en un determinado rango. Usar query luego para obtener algo que sirva
+	##Parámetros:
+	##var: atributo a filtrar (STRING)
+	##mayor_a y menor_a: mayor y menor valor del rango respectivamente
+	##igual1 e igual2: true si es mayor/menor igual flase si es desigualdad estricta
 	def self.query_attr_rango(var, mayor_a, igual1,menor_a, igual2)
 
 		case var 
@@ -67,20 +70,29 @@ class Ventaproducto
 
 		if(igual2 && !igual1)
 			puts '3'
-			query = Ventaproducto.where(:ingresos.gt => mayor_a, :ingresos.lte => menor_a)
+			query = Ventaproducto.where(var.gt => mayor_a, var.lte => menor_a)
 		end
 
 		if(igual1==false && igual2==false)
 			puts '4'
-			query = Ventaproducto.where(:ingresos.gt => mayor_a, :ingresos.lt => menor_a)
+			query = Ventaproducto.where(var.gt => mayor_a, var.lt => menor_a)
 		end
 
 		return query
 	end
 
-	
+	##Recibe una query onbtenida con el método anterior y a partir de ella obtener avg, min ,max de un atributo dado
+	##Si se quiere solo los id's o la cantidad(count) darle cualquier atributo o cualquier cosa
+	##Parámetros:
+	##query: usar valor retornado por método anterior
+	##var: atributo al que se le quiere hacer agregación
+	##Retorna un hash en que:
+	##[:ids] : id's de las tuplas en el rango
+	##[:count] : cantidad de tuplas en el rango
+	##[:avg] : promedio del atributo entregado(var) en las tuplas dentro del rango
+	##[:min] : mínimo del atributo entregado(var) en las tuplas dentro del rango
+	##[:max] : máximo del atributo entregado(var) en las tuplas dentro del rango
 	def self.aggr_attr(query, var)
-
 
 		case var 
 		
@@ -117,7 +129,7 @@ class Ventaproducto
 		a=docs[0]
 		while a!=nil do
 			puts a
-			Ventaproducto.id_attr(docs[i], :fecha)
+			puts "#{Ventaproducto.id_attr(docs[i], :fecha)} -- #{Ventaproducto.id_attr(docs[i], :sku_producto)} -- #{Ventaproducto.id_attr(docs[i], :cantidad_transada)}"
 			i+=1
 			a = docs[i]
 		end
@@ -127,8 +139,11 @@ class Ventaproducto
 
 	end
 
+	##Retorna el valor de un atributo dado de la tupla de id dado
+	##Parámetros
+	##id : id de la tupla (se obtiene del hash obtenido de la query anterior o de la query que retorna query_attr_rango haciendo .inspect) 
 	def self.id_attr(id, var)
-		puts Ventaproducto.where(:_id => id).distinct(var)
+		return Ventaproducto.where(:_id => id).distinct(var)
 	end
 
 	def self.run
@@ -137,7 +152,6 @@ class Ventaproducto
 		query = Ventaproducto.query_attr_rango('cantidad_transada',1, true, 6, false)
 		q = Ventaproducto.aggr_attr(query, 'fecha')
 		Ventaproducto.id_attr(q[:ids][3], :fecha)
-
 	end
 
 	def self.run1
