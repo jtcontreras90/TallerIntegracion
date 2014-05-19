@@ -17,9 +17,12 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 # Learn more: http://github.com/javan/whenever
+every 10.minutes do
+  runner "Pedido.cargar"
+end
+
 
 every 15.minutes do
-  runner "Pedido.cargar"
   runner "Pedido.preguntarPedidosPendientes"
   runner "Bodega.enviarProducto"
 end

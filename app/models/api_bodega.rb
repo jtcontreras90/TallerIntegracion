@@ -15,7 +15,6 @@ class ApiBodega < ActiveRecord::Base
 	def self.getAlmacenes
 		response= RestClient.get "http://bodega-integracion-2014.herokuapp.com/almacenes", {:Authorization => "UC grupo9:vdgf4m3rusH1dXghLy9yMPGL+fk="}
 		r=JSON.parse response
-		puts r
 		#puts response
 		r
 	end
@@ -31,7 +30,7 @@ class ApiBodega < ActiveRecord::Base
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
 		response= RestClient.get "http://bodega-integracion-2014.herokuapp.com/skusWithStock?almacenId=#{almacenId}", {:Authorization => "UC grupo9:#{hash}"}
 		r=JSON.parse response
-		puts r
+		
 		r
 	end
 	# dado un almacen y un sku, retorna todos los productos del almacen que tengan ese sku de la siguiente manera: 
@@ -60,7 +59,7 @@ class ApiBodega < ActiveRecord::Base
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
 		response= RestClient.post "http://bodega-integracion-2014.herokuapp.com/moveStock",{'productoId' => productoId, 'almacenId' => almacenId}, {:Authorization => "UC grupo9:#{hash}"}
-		# puts response
+		#puts response
 		r=JSON.parse response
 
 		r
@@ -96,7 +95,7 @@ class ApiBodega < ActiveRecord::Base
 		#response= RestClient.delete "http://bodega-integracion-2014.herokuapp.com/stock?#{parametros.to_query}", {:Authorization => "UC grupo9:#{hash}"}
 		response=RestClient::Request.execute(:method => 'delete', :url => "http://bodega-integracion-2014.herokuapp.com/stock",:headers =>{:Authorization => "UC grupo9:#{hash}"}, :payload =>parametros)
 		#response= RestClient.delete 'http://bodega-integracion-2014.herokuapp.com/stock',{'Authorization' => hash,:accept => :json, :params=>{:productId=>productId, :dirección=>dirección, :precio=>precio,:pedidoId=>pedidoId}}
-		# puts response
+		puts response
 		r=JSON.parse response
 
 		r
@@ -111,7 +110,7 @@ class ApiBodega < ActiveRecord::Base
 		almacenes.each do |i|
 			productos=ApiBodega.getSkusWithStock(i["_id"])
 			productos.each do |j|
-				if("#{j["_id"]}"=="#{sku}")
+				if(j["_id"]==sku)
 					total=j["total"]+total
 				end	
 			end	
@@ -123,7 +122,6 @@ class ApiBodega < ActiveRecord::Base
 		if total < 0
 			total=0
 		end
-		puts total
 		total
 	end
 	# retorna un bool dependiendo si existe la cantidad de producto solicitada. 
