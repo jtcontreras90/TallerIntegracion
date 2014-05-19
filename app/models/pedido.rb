@@ -55,7 +55,7 @@ class Pedido < ActiveRecord::Base
         else
           reservadosTotales=Reserva.getReservasXSKU(pedido.sku)
           reservadosCliente=Reserva.getReservasXCliente(pedido.sku,pedido.rut)
-          stockDisponible=ApiBodega.obtenerStock(pedido.sku)
+          stockDisponible=ApiBodega.obtenerStock("#{pedido.sku}")
           puts "Sku: #{pedido.sku}"
           puts "Cantidad pedida: #{pedido.cantidad}"
           puts "Cantidad disponible: #{stockDisponible}"
