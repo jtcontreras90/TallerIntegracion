@@ -11,8 +11,9 @@ class ApiController < ApplicationController
 		#Si existe la variante, entonces existe el producto
 
 		disponible=ApiBodega.obtenerStock(params[:sku]) #Stock del producto con el sku dado
+		costo=Pricing.precioTransferenciaBySKU(params[:sku])
 
-		render :json => {status: 200, response: {sku: params[:sku], cantidad: disponible}}
+		render :json => {status: 200, response: {sku: params[:sku], cantidad: disponible, costo: costo}}
 	end
 
 
@@ -26,12 +27,23 @@ class ApiController < ApplicationController
 		disponible=ApiBodega.obtenerStock(params[:sku]) #Stock del producto con el sku dado
 
 		enviado=0
+		costo=0
 
-		if disponible >= params[:cantidad].to_i
-			enviado=ApiBodega.despacharOtrasBodegas(params[:almacenId],params[:sku],params[:cantidad].to_i) #Despachar a almacenId
+		if disponible >= params[:cantidad].to_i and params[:cantidad].to_i >0
+			costo=Pricing.precioTransferenciaBySKU(params[:sku])*params[:cantidad].to_i
+			t=Transferencia.new
+			t.almacenId=params[:almacenId]
+			t.sku=params[:sku]
+			t.cantidad=params[:cantidad].to_i
+			t.costotransferencia=costo
+			t.sent=false
+			t.bodega=@bodega
+			t.save
+			enviado=params[:cantidad].to_i
+			# enviado=ApiBodega.despacharOtrasBodegas(params[:almacenId],params[:sku],params[:cantidad].to_i) #Despachar a almacenId
 		end
 
-		render :json => {status: 200, response: {sku: params[:sku], cantidad: enviado}}
+		render :json => {status: 200, response: {sku: params[:sku], cantidad: enviado, costo: costo}}
 
 	end
 

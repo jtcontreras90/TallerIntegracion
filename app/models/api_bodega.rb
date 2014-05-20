@@ -15,7 +15,7 @@ class ApiBodega < ActiveRecord::Base
 	def self.getAlmacenes
 		response= RestClient.get "http://bodega-integracion-2014.herokuapp.com/almacenes", {:Authorization => "UC grupo9:vdgf4m3rusH1dXghLy9yMPGL+fk="}
 		r=JSON.parse response
-		puts response
+		#puts response
 		r
 	end
 
@@ -59,7 +59,7 @@ class ApiBodega < ActiveRecord::Base
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
 		response= RestClient.post "http://bodega-integracion-2014.herokuapp.com/moveStock",{'productoId' => productoId, 'almacenId' => almacenId}, {:Authorization => "UC grupo9:#{hash}"}
-		puts response
+		#puts response
 		r=JSON.parse response
 
 		r
@@ -69,12 +69,12 @@ class ApiBodega < ActiveRecord::Base
 		#retorna el almacen y el producto. Errores: los mismos que mover stock pero incluye: producto no se encuentra en la guia de despacho. 
 	def self.moverStockBodega(almacenId, productoId)      
 		signature = "POST#{productoId}#{almacenId}"
-		puts signature
+		#puts signature
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
-		#puts hash
+		##puts hash
 		response= RestClient.post "http://bodega-integracion-2014.herokuapp.com/moveStockBodega",{'productoId' => productoId, 'almacenId' => almacenId}, {:Authorization => "UC grupo9:#{hash}"}
-		#puts response
+		##puts response
 		r=JSON.parse response
 
 		r
@@ -86,16 +86,16 @@ class ApiBodega < ActiveRecord::Base
 
 	def self.despacharStock(productoId, direccion, precio, pedidoId)
 		signature = "DELETE#{productoId}#{direccion}#{precio}#{pedidoId}"
-		puts signature
+		#puts signature
 		key= 'wjNBuMv2'
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
-		puts hash
+		#puts hash
 		#{'productoId' => productoId, 'direccion' => direccion,'precio' => precio, 'pedidoId' => pedidoId},
 		parametros={productoId: productoId,direccion: direccion,precio: precio,pedidoId: pedidoId}
 		#response= RestClient.delete "http://bodega-integracion-2014.herokuapp.com/stock?#{parametros.to_query}", {:Authorization => "UC grupo9:#{hash}"}
 		response=RestClient::Request.execute(:method => 'delete', :url => "http://bodega-integracion-2014.herokuapp.com/stock",:headers =>{:Authorization => "UC grupo9:#{hash}"}, :payload =>parametros)
 		#response= RestClient.delete 'http://bodega-integracion-2014.herokuapp.com/stock',{'Authorization' => hash,:accept => :json, :params=>{:productId=>productId, :dirección=>dirección, :precio=>precio,:pedidoId=>pedidoId}}
-		puts response
+		#puts response
 		r=JSON.parse response
 
 		r
@@ -116,10 +116,13 @@ class ApiBodega < ActiveRecord::Base
 			end	
 				
 		end
-		puts total
-
+		#Corresponde a los productos que pidieron otras bodegas pero que aún no se han enviado
+		yaEnviado=Transferencia.where(sku: sku, sent: false).sum(:cantidad)
+		total=total-yaEnviado
+		if total < 0
+			total=0
+		end
 		total
-
 	end
 	# retorna un bool dependiendo si existe la cantidad de producto solicitada. 
 	def self.validarStock(sku,cantidad)
@@ -188,17 +191,17 @@ class ApiBodega < ActiveRecord::Base
 
 	#despacho otras bodegas dado el almacen de recepción de otro grupo, el sku y la cantidad. 
 	def self.despacharOtrasBodegas(almacenId,sku,cantidad)
-		puts "Empezando todo"
+		#puts "Empezando todo"
 		ApiBodega.moverProductosBodegaDespacho(sku, cantidad)
-		puts "Pasa por aquí"
+		#puts "Pasa por aquí"
 		i = 0
 		j = 0
 		productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
 		#while i< cantidad do
 			productos.each_with_index do |element,index|
-				puts "Cantidad enviada actual: #{i}"
+				#puts "Cantidad enviada actual: #{i}"
 				if i<cantidad and index >= j #
-						puts "Tratará de enviar el producto #{element["_id"]} a #{almacenId}"
+						#puts "Tratará de enviar el producto #{element["_id"]} a #{almacenId}"
    						ApiBodega.moverStockBodega(almacenId,element["_id"])
    						i=i+1 
    						j=j+1
@@ -228,6 +231,7 @@ class ApiBodega < ActiveRecord::Base
 
 	#intenta vaciar la bodega de recepción moviendo los productos a las dos bodegas centrales
 	def self.vaciarBodegaRecepcion
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Begin at #{Time.now}"
 		begin
 			skus=ApiBodega.getSkusWithStock('53571e54682f95b80b786eb9')
 			skus.each do |i|
@@ -267,17 +271,18 @@ class ApiBodega < ActiveRecord::Base
 
 			
 		end
-		
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Finish at #{Time.now}"
 	end
 
 		#intenta vaciar la bodega pulmon moviendo los productos a las dos bodegas centrales
 	def self.vaciarBodegaPulmon
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Begin at #{Time.now}"
 		begin
-			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d132')
+			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
 			skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d132', i["_id"])
+					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -289,11 +294,11 @@ class ApiBodega < ActiveRecord::Base
 			end	
 		rescue Exception => e
 			begin
-				skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d132')
+				skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
 				skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d132', i["_id"])
+					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -311,8 +316,43 @@ class ApiBodega < ActiveRecord::Base
 
 			
 		end
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Finish at #{Time.now}"
 		
 	end
+	# suma los costos de todos los productos de la bodega pulmon 
+	def self.reportarBPulmonDw
+		#costo diario de la bodega
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
+		costoDia=0
+		skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
+		skus.each do |i|
+			j=0
+			while j<i["total"]
+				productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+				productos.each do |k|
+					if j<i["total"]
+						
+						costoDia=ApiBodega.moverProductoBodegaCentra1(k["costo"])+costoDia
+						j=j+1
+					end
+				end
+			end
+		end	
+		#fecha que se reporta al datawerehouse
+		time = Time.now
+		fecha=time.inspect
+		puts fecha
+		#cantidad total de productos en la bodegaPulmon
+		almacenes=getAlmacenes
+		cantTotal= almacenes[3]["usedSpace"] 
+
+		Costobodegapulmon.agregar(costoDia, fecha,cantTotal)
+
+    	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
+		
+	end
+
+
 
 	def self.run
 		#Bodega de recepción
@@ -322,8 +362,11 @@ class ApiBodega < ActiveRecord::Base
 		# ApiBodega.getSkusWithStock("53571e54682f95b80b786eba")
 		# ApiBodega.despacharStock('53571e55682f95b80b7899aa', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
 		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		
+		
 
-		#ApiBodega.getAlmacenes()
+		#reportarBPulmonDw
+		ApiBodega.getAlmacenes()
 		#ApiBodega.moverProductosBodegaRecepcion('3517982', 5)
 		#ApiBodega.getAlmacenes()
 		#ApiBodega.vaciarBodegaRecepcion()
@@ -344,6 +387,7 @@ class ApiBodega < ActiveRecord::Base
 		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
 		# ApiBodega.despacharStock('53571e55682f95b80b789997', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
 	
+
 	end
 
 end
