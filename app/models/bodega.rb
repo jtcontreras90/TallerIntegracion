@@ -29,7 +29,7 @@
         when 4
           url="http://integra4.ing.puc.cl/api/pedirProducto"
           user="grupo9"
-          pass="795f5a03cad01447898fb5861de0d0af6115b0c1"
+          pass="795f5a03cad01447898fb5861de0d0af6115b0c1" #sha1
           almacenId="53571e54682f95b80b786eb9"
           response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
           if not JSON.parse(response.body).has_key?('error')
@@ -39,9 +39,9 @@
         when 5
           url="http://integra5.ing.puc.cl:8080/api/v1/pedirProducto"
           user="grupo9"
-          pass="JgS9I4od03"
-          almacenId="53571e54682f95b80b786eb9"
-          response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad }
+          pass="JgS9I4od03" #pass
+          almacenId="53571e54682f95b80b786eb9" 
+          response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :SKU=>sku, :cantidad=>cantidad }
           if not JSON.parse(response.body).has_key?('error')
             cantidad=0
             break
@@ -52,6 +52,7 @@
           url="http://integra8.ing.puc.cl/api/pedirProducto"
           user="grupo9"
           almacenId="53571e54682f95b80b786eb9"
+          pass="5HUKt4Ltn/A3cypvmotC2swYC3Y=" #sha1 base 64
           response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
           if not JSON.parse(response.body).has_key?('error')
             cantidad=0
