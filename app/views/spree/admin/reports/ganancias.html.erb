@@ -1,0 +1,41 @@
+<%content_for :page_title do%>
+	Ganancias del último mes
+<%end%>
+
+<%content_for :page_actions do%>
+	<li><%link_to_with_icon 'icon-arrow-left', Spree.t(:back_to_reports_list), spree.admin_reports_url, :class=>'button'%></li>
+<%end%>
+
+<h1>Resumen</h1>
+<h2>Total de utilidades: <b>$ <%= @qqq[:sum]%></b></h2>
+<br><br>
+<h1>Ganancias por producto</h1>
+<table>
+	<tr>
+		<td>SKU</td>
+		<td>Ganancias</td>
+	</tr>
+	<tr>
+		<% @q.each do |c|%>
+		<td><%= c._id %></td>
+		<td><%= c.sum_utilidades %></td>
+		<% end %>
+	</tr>
+</table>
+
+
+<br>
+<br><h1>Ganancias por cliente</h1>
+<table>
+	<tr>
+		<td>RUT cliente</td>
+		<td>Ganancias</td>
+	</tr>
+	<tr>
+		<% @qq.each do |c|%>
+		<td><%= c._id %></td>
+		<td><%= c.sum_utilidades %></td>
+		<% end %>
+	</tr>
+</table>
+

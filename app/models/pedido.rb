@@ -55,7 +55,7 @@ class Pedido < ActiveRecord::Base
           pedido.quebrado=true
           pedido.save
           if stockDisponible<pedido.cantidad
-            Bodega.pedirProducto(pediodo.sku,pedido.cantidad)
+            Bodega.pedirProducto(pediodo.sku,pedido.cantidad-stockDisponible)
           end
         else
 
