@@ -72,7 +72,7 @@ class Consultador
 		date2 = "2014-05-20T23:59:59+05:30".gsub(/T.*/, '')
 		#query = Ventaproducto.query_attr_rango('fecha',DateTime.parse(date), true,DateTime.now, true)
 		#q = Ventaproducto.aggr_attr(query, 'fecha')
-		q=Consultador.agg_attr_sku(Ventaproducto, 'top', 4, DateTime.parse(date1),DateTime.parse(date2))
+		q=Consultador.agg_attr_sku(Ventaproducto, 'top', 4, Date.today,Date.tomorrow)
 		#Ventaproducto.id_attr(q[:ids][3], :fecha)
 		Consultador.agg_attr_sku(Ventaproducto, 'avg', 'ingresos', DateTime.parse(date1),DateTime.parse(date2))
 		Consultador.agg_attr_sku(Ventaproducto, 'sum', 'cantidad_transada', DateTime.parse(date1),DateTime.parse(date2))
