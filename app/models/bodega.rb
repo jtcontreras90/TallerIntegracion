@@ -19,34 +19,45 @@
 	end
 
 	def self.pedirProducto(sku,cantidad)
+	  contar=0
 	  for i in 1..8
-      case i
-      when 1
-      when 2
-      when 3
-      when 4
-        url="http://integra4.ing.puc.cl/api/pedirProducto"
-        user="grupo9"
-        pass="795f5a03cad01447898fb5861de0d0af6115b0c1"
-        almacenId="53571e54682f95b80b786eb9"
-        response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
-        if not JSON.parse(response.body).has_key?('error')
-          cantidad=0
-          break
+	    if contar < cantidad #Acá a penas se recibe algo se acepta, no nos aseguramos de recibir TODO el pedido
+        case i
+        when 1
+        when 2
+        when 3
+        when 4
+          url="http://integra4.ing.puc.cl/api/pedirProducto"
+          user="grupo9"
+          pass="795f5a03cad01447898fb5861de0d0af6115b0c1"
+          almacenId="53571e54682f95b80b786eb9"
+          response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
+          if not JSON.parse(response.body).has_key?('error')
+            cantidad=0
+            break
+          end
+        when 5
+          url="http://integra5.ing.puc.cl:8080/api/v1/pedirProducto"
+          user="grupo9"
+          pass="JgS9I4od03"
+          almacenId="53571e54682f95b80b786eb9"
+          response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad }
+          if not JSON.parse(response.body).has_key?('error')
+            cantidad=0
+            break
+          end
+        when 6
+        when 7
+        when 8
+          url="http://integra8.ing.puc.cl/api/pedirProducto"
+          user="grupo9"
+          almacenId="53571e54682f95b80b786eb9"
+          response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
+          if not JSON.parse(response.body).has_key?('error')
+            cantidad=0
+            break
+          end
         end
-      when 5
-        url="http://integra5.ing.puc.cl:8080/api/v1/pedirProducto"
-        user="grupo9"
-        pass="JgS9I4od03"
-        almacenId="53571e54682f95b80b786eb9"
-        response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad }
-        if not JSON.parse(response.body).has_key?('error')
-          cantidad=0
-          break
-        end
-      when 6
-      when 7
-      when 8
       end
     end
   end
