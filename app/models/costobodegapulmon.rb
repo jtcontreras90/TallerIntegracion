@@ -27,14 +27,14 @@ class Costobodegapulmon
 
 		case var 
 		
-		when 'sku' || 'sku_producto'
-			var = :sku_producto
+		when 'costo'
+			var = :costo
 
-		when 'rut' || 'rut_cliente'
-			var = :rut_cliente
+		when 'cantidad' || 'cantidad_productos'
+			var = :fecha
 
 		when 'fecha'
-			var = :fecha
+			var = :cantidad_productos
 
 		else 
 			puts "No existe atributo #{var} --"
@@ -44,25 +44,25 @@ class Costobodegapulmon
 
 		if(igual1 && igual2)
 			puts '1'
-			query = Quiebre.where(var.gte => mayor_a, var.lte => menor_a)
+			query = Costobodegapulmon.where(var.gte => mayor_a, var.lte => menor_a)
 		  	##suma = collection.aggregate([{"$group" => { :sku_producto : "$sku_producto", :cantidad_transada => {"$sum" => "$cantidad_transada"}}}])
 		end
 
 		if(igual1 && !igual2)
 			puts '2'
-			query = Quiebre.where(var.gte => mayor_a, var.lt => menor_a)
-			##q = Quiebre.where(var.gte => mayor_a, var.lt => menor_a).
+			query = Costobodegapulmon.where(var.gte => mayor_a, var.lt => menor_a)
+			##q = Costobodegapulmon.where(var.gte => mayor_a, var.lt => menor_a).
 		  ##distinct(:sku_producto)
  		end
 
 		if(igual2 && !igual1)
 			puts '3'
-			query = Quiebre.where(var.gt => mayor_a, var.lte => menor_a)
+			query = Costobodegapulmon.where(var.gt => mayor_a, var.lte => menor_a)
 		end
 
 		if(igual1==false && igual2==false)
 			puts '4'
-			query = Quiebre.where(var.gt => mayor_a, var.lt => menor_a)
+			query = Costobodegapulmon.where(var.gt => mayor_a, var.lt => menor_a)
 		end
 
 		return query
@@ -83,10 +83,10 @@ class Costobodegapulmon
 
 		case var 
 		
-		when 'sku' || 'sku_producto'
+		when 'costo'
 			var = :sku_producto
 
-		when 'rut' || 'rut_cliente'
+		when 'cantidad' || 'cantidad_productos'
 			var = :rut_cliente
 
 		when 'fecha'
@@ -111,7 +111,7 @@ class Costobodegapulmon
 		a=docs[0]
 		while a!=nil do
 			puts a
-			puts "#{Quiebre.id_attr(docs[i], :fecha)} -- #{Quiebre.id_attr(docs[i], :rut_cliente)} -- #{Quiebre.id_attr(docs[i], :sku_producto)}"
+			puts "#{Costobodegapulmon.id_attr(docs[i], :fecha)} -- #{Costobodegapulmon.id_attr(docs[i], :rut_cliente)} -- #{Costobodegapulmon.id_attr(docs[i], :sku_producto)}"
 			i+=1
 			a = docs[i]
 		end
@@ -127,7 +127,7 @@ class Costobodegapulmon
 
 	##var: atributo a que se busca
 	def self.id_attr(id, var)
-		return Quiebre.where(:_id => id).distinct(var)
+		return Costobodegapulmon.where(:_id => id).distinct(var)
 	end
 
 	##Retorna el valor de un atributo dado un valor determinado del otro
@@ -138,10 +138,10 @@ class Costobodegapulmon
 	def self.attr_attr(var1, val, var2)
 		case var1 
 		
-		when 'sku' || 'sku_producto'
+		when 'costo'
 			var1 = :sku_producto
 
-		when 'rut' || 'rut_cliente'
+		when 'cantidad' || 'cantidad_productos'
 			var1 = :rut_cliente
 
 		when 'fecha'
@@ -154,10 +154,10 @@ class Costobodegapulmon
 
 		case var2
 		
-		when 'sku' || 'sku_producto'
+		when 'costo'
 			var2 = :sku_producto
 
-		when 'rut' || 'rut_cliente'
+		when 'cantidad' || 'cantidad_productos'
 			var2 = :rut_cliente
 
 		when 'fecha'
@@ -168,26 +168,20 @@ class Costobodegapulmon
 
 		end
 
-		return Quiebre.where(var1=> val).distinct(var2)
+		return Costobodegapulmon.where(var1=> val).distinct(var2)
 	end
 
 	def self.run
-		##Quiebre.agregar(40300,100000,3,13,DateTime.now)
-		Quiebre.query
-		query = Quiebre.query_attr_rango('fecha',DateTime.now, false, "2015-04-11", false)
-		q = Quiebre.aggr_attr(query, 'sku')
-		puts Quiebre.id_attr(q[:ids][0], 'fecha')
-		puts Quiebre.attr_attr('sku',123,'rut')
+		##Costobodegapulmon.agregar(40300,100000,3,13,DateTime.now)
+		Costobodegapulmon.query
+		query = Costobodegapulmon.query_attr_rango('fecha',DateTime.now, false, "2015-04-11", false)
+		q = Costobodegapulmon.aggr_attr(query, 'costo')
+		puts Costobodegapulmon.id_attr(q[:ids][0], 'fecha')
+		puts Costobodegapulmon.attr_attr('fecha',123,'costo')
 	end
 
 	def self.run1
-		Quiebre.agregar(2000,DateTime.now,2)
-		Quiebre.agregar(2400,"2014-04-01",1)
-		Quiebre.agregar(3600,DateTime.now,5)
-		Quiebre.agregar(5000,"2014-05-22",2)
-		Quiebre.agregar(1200,DateTime.now,3)
-		Quiebre.agregar(200,"2015-04-11",12)
-		Quiebre.agregar(10000,"2013-11-11",4)
+		####
 	end
 
 
