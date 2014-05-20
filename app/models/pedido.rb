@@ -16,26 +16,26 @@ class Pedido < ActiveRecord::Base
         pedidoID=file.name.split('_')[1].to_i
         if file.name!=".." and file.name!="."
           #if Time.at(file.attributes.mtime)>revision
-            raw =sftp.download!("Pedidos/"+file.name)
-            doc = Document.new(raw)
-            fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
-            horaPedido=doc.elements['xml/Pedidos'].attributes['hora']
-            fecha=DateTime.parse(fechaPedido+" "+horaPedido).strftime('%Y-%m-%d %H:%M')
-            rut=doc.elements['xml/Pedidos/rut'].text
-            direccionID=doc.elements['xml/Pedidos/direccionId'].text.to_i
-            vtiger=Vtiger.new
-            if vtiger.direccionByRutAndDireccionId(rut,direccionID)
-              fechaLimite=Date.parse(doc.elements['xml/Pedidos/fecha'].text)
-              doc.elements.each("xml/Pedidos/Pedido") do | element|
-                sku=element.elements['sku'].text.strip
-                unidad=element.elements['cantidad'].attributes['unidad']
-                cantidad=element.elements['cantidad'].text.to_f
-                pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false)
-                pedido.save
-              end
+          raw =sftp.download!("Pedidos/"+file.name)
+          doc = Document.new(raw)
+          fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
+          horaPedido=doc.elements['xml/Pedidos'].attributes['hora']
+          fecha=DateTime.parse(fechaPedido+" "+horaPedido).strftime('%Y-%m-%d %H:%M')
+          rut=doc.elements['xml/Pedidos/rut'].text
+          direccionID=doc.elements['xml/Pedidos/direccionId'].text.to_i
+          vtiger=Vtiger.new
+          if vtiger.direccionByRutAndDireccionId(rut,direccionID)
+            fechaLimite=Date.parse(doc.elements['xml/Pedidos/fecha'].text)
+            doc.elements.each("xml/Pedidos/Pedido") do | element|
+              sku=element.elements['sku'].text.strip
+              unidad=element.elements['cantidad'].attributes['unidad']
+              cantidad=element.elements['cantidad'].text.to_f
+              pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false)
+              pedido.save
             end
-            vtiger.logout
-          #end
+          end
+        vtiger.logout
+        #end
         end
       end
     end
@@ -46,23 +46,25 @@ class Pedido < ActiveRecord::Base
     Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Begin at #{Time.now}"
     Pedido.all.each do |pedido|
       if not pedido.enviado and not pedido.quebrado
+        sku=pedido.sku.strip
+        reservadosTotales=Reserva.getReservasXSKU(sku)
+        reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
+        stockDisponible=ApiBodega.obtenerStock(sku)
         if pedido.fechaLimite<DateTime.now()
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
           pedido.save
-          #if ApiBodega.obtenerStock(sku)==0
+          if stockDisponible<pedido.cantidad
             Bodega.pedirProducto(pediodo.sku,pedido.cantidad)
+          end
         else
-          sku=pedido.sku.strip
-          reservadosTotales=Reserva.getReservasXSKU(sku)
-          reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
-          stockDisponible=ApiBodega.obtenerStock(sku)
-          # puts "Sku: #{pedido.sku}"
-          # puts "Cantidad pedida: #{pedido.cantidad}"
-          # puts "Cantidad disponible: #{stockDisponible}"
-          # puts "Cantidad disponible para el cliente: #{[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
-          # puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
-          # puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
+
+        # puts "Sku: #{pedido.sku}"
+        # puts "Cantidad pedida: #{pedido.cantidad}"
+        # puts "Cantidad disponible: #{stockDisponible}"
+        # puts "Cantidad disponible para el cliente: #{[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
+        # puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
+        # puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
           if pedido.cantidad<stockDisponible and pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente
             #Vender el producto
             variant=Spree::Variant.where(sku: sku).first()
@@ -77,8 +79,8 @@ class Pedido < ActiveRecord::Base
             direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
             vtiger.logout
             ApiBodega.despacharProducto(sku, pedido.cantidad,direccion['calle']+', '+direccion['ciudad']+', '+direccion['region'], 0, pedido.id)
-            pedido.enviado=true
-            pedido.save
+          pedido.enviado=true
+          pedido.save
           end
         end
       end
