@@ -50,7 +50,8 @@ class Pedido < ActiveRecord::Base
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
           pedido.save
-          
+          #if ApiBodega.obtenerStock(sku)==0
+            Bodega.pedirProducto(pediodo.sku,pedido.cantidad)
         else
           sku=pedido.sku.strip
           reservadosTotales=Reserva.getReservasXSKU(sku)
