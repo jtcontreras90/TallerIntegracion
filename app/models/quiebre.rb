@@ -98,11 +98,16 @@ class Quiebre
 
 		q = {ids:query.distinct(:_id), 
 			count: query.count, 
+			sum: query.sum(var),
 			avg: query.avg(var),
 			max: query.max(var),
 			min: query.min(var)}
 		puts var	
-		puts q[:avg]			
+
+
+		q.each do |y|
+		puts y
+		end
 
 		i=0
 		docs = q[:ids]

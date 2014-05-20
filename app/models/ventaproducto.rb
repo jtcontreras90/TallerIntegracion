@@ -1,6 +1,7 @@
 require 'mongoid'
-##require "moped"
+require "moped"
 require 'pp'
+require 'date'
 
 class Ventaproducto
 	include Mongoid::Document
@@ -9,11 +10,15 @@ class Ventaproducto
 	field :ingresos, type: Integer
 	field :cantidad_transada, type: Integer
 	field :sku_producto, type: Integer
-	field :fecha, type: Date
+	field :fecha, type: DateTime
 
 	def self.agregar(ut, ing, cant, sku, f)
 		Ventaproducto.create(utilidades: ut, ingresos: ing, cantidad_transada: cant, sku_producto: sku, fecha: f)
 	end
+
+########################################################################################
+####Para consultar por agregación respecto a cada producto usar método: aggr_attr_sku###
+########################################################################################
 
 	def self.query
 		Ventaproducto.all.each do |venta|
@@ -58,7 +63,7 @@ class Ventaproducto
 		if(igual1 && igual2)
 			puts '1'
 			query = Ventaproducto.where(var.gte => mayor_a, var.lte => menor_a)
-		  	##suma = collection.aggregate([{"$group" => { :sku_producto : "$sku_producto", :cantidad_transada => {"$sum" => "$cantidad_transada"}}}])
+		  	puts  Ventaproducto.collection.aggregate([{"$match" => {var => {"$gte" => mayor_a}}},{ "$group" => { "_id" => "$sku_producto", "total_ingresos" => {"$sum"=>"$ingresos"} } }])
 		end
 
 		if(igual1 && !igual2)
@@ -118,6 +123,7 @@ class Ventaproducto
 
 		q = {ids:query.distinct(:_id) , 
 			count: query.count, 
+			sum: query.sum(var), 
 			avg: query.avg(var),
 			max: query.max(var),
 			min: query.min(var)}
@@ -146,16 +152,57 @@ class Ventaproducto
 		return Ventaproducto.where(:_id => id).distinct(var)
 	end
 
+
 	def self.run
 		##Ventaproducto.agregar(40300,100000,3,13,DateTime.now)
 		Ventaproducto.query
-		query = Ventaproducto.query_attr_rango('cantidad_transada',1, true, 6, false)
-		q = Ventaproducto.aggr_attr(query, 'fecha')
-		Ventaproducto.id_attr(q[:ids][3], :fecha)
+		date1 = "2014-04-17T23:59:59+05:30".gsub(/T.*/, '')
+		date2 = "2014-04-19T23:59:59+05:30".gsub(/T.*/, '')
+		#query = Ventaproducto.query_attr_rango('fecha',DateTime.parse(date), true,DateTime.now, true)
+		#q = Ventaproducto.aggr_attr(query, 'fecha')
+		q=Ventaproducto.agg_attr_sku('max', 'utilidades', DateTime.parse(date1),DateTime.parse(date2))
+		#Ventaproducto.id_attr(q[:ids][3], :fecha)
+		Ventaproducto.agg_attr_sku('max', 'ingresos', DateTime.parse(date1),DateTime.parse(date2))
+		Ventaproducto.agg_attr_sku('max', 'cantidad_transada', DateTime.parse(date1),DateTime.parse(date2))
+		
+		q.each do |y|
+			puts y['max_utilidades']
+		end
+
 	end
 
 	def self.run1
-		Ventaproducto.agregar(2000,4000,1,15,"2014-05-20")
+		Ventaproducto.collection.find.remove_all
+
+		date = "2014-04-18T23:59:59+05:30".gsub(/T.*/, '')
+		Ventaproducto.agregar(600,1000,2,1,DateTime.parse(date))
+		Ventaproducto.agregar(212000,232000,8,12,DateTime.parse(date))
+		Ventaproducto.agregar(121000,401000,5,123,DateTime.parse(date))
+		Ventaproducto.agregar(2000,8000,3,1234,DateTime.parse(date))
+		Ventaproducto.agregar(2500000,6000000,4,12,DateTime.parse(date))
+
+		date = "2014-04-28T23:59:59+05:30".gsub(/T.*/, '')
+		Ventaproducto.agregar(6000,12000,3,1,DateTime.parse(date))
+		Ventaproducto.agregar(22000,23000,4,12,DateTime.parse(date))
+		Ventaproducto.agregar(21000,40000,10,1234,DateTime.parse(date))
+		Ventaproducto.agregar(2000,800000,1,123,DateTime.parse(date))
+		Ventaproducto.agregar(22500,60000,7,1,DateTime.parse(date))
+
+
+		date = "2014-05-19T23:59:59+05:30".gsub(/T.*/, '')
+		Ventaproducto.agregar(50,100,3,123,DateTime.parse(date))
+		Ventaproducto.agregar(221000,232000,8,12,DateTime.parse(date))
+		Ventaproducto.agregar(31000,40000,11,1234,DateTime.parse(date))
+		Ventaproducto.agregar(4000,4100,3,1234,DateTime.parse(date))
+		Ventaproducto.agregar(2500,5000,1,1,DateTime.parse(date))
+
+
+		Ventaproducto.agregar(60000,61000,2,1,DateTime.now)
+		Ventaproducto.agregar(22000,23000,2,1234,DateTime.now)
+		Ventaproducto.agregar(2100,4000,2,123,DateTime.now)
+		Ventaproducto.agregar(23000,28000,2,123,DateTime.now)
+		Ventaproducto.agregar(12500,16000,2,12,DateTime.now)
 	end
+
 	
 end

@@ -35,6 +35,8 @@ gem 'bson', '~> 2.2.3'
 
 gem 'mongoid', '~> 4.0.0.beta1'
 
+gem 'moped'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false

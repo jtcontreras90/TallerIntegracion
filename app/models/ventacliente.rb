@@ -7,7 +7,7 @@ class Ventacliente
 	field :ingresos, type: Integer
 	field :cantidad_pedidos, type: Integer
 	field :rut_cliente, type: String
-	field :fecha, type: Date
+	field :fecha, type: DateTime
 
 	def self.agregar(ut, ing, cant, rut, f)
 		Ventacliente.create(utilidades: ut, ingresos: ing, cantidad_pedidos: cant, rut_cliente: rut, fecha: f)
@@ -114,6 +114,7 @@ class Ventacliente
 
 		q = {ids:query.distinct(:_id), 
 			count: query.count, 
+			sum: query.sum(var), 
 			avg: query.avg(var),
 			max: query.max(var),
 			min: query.min(var)}
@@ -144,6 +145,7 @@ class Ventacliente
 
 	def self.run
 		##Ventacliente.agregar(40300,100000,3,13,DateTime.now)
+
 		Ventacliente.query
 		query = Ventacliente.query_attr_rango('fecha',DateTime.now, false, "2015-04-20", true)
 		q = Ventacliente.aggr_attr(query, 'utilidades')
