@@ -1,0 +1,11 @@
+<%content_for :page_title do%>
+	Transacciones
+<%end%>
+
+<%content_for :page_actions do%>
+	<li><%link_to_with_icon 'icon-arrow-left', Spree.t(:back_to_reports_list), spree.admin_reports_url, :class=>'button'%></li>
+<%end%>
+
+
+<h1>Trasacciones realizadas el último mes</h1>
+<h2><%= @total %></h2>

@@ -6,60 +6,22 @@ TallerIntegracion::Application.routes.draw do
   #
   # We ask that you don't use the :as option here, as Spree relies on it being the default of "spree"
   mount Spree::Core::Engine, :at => '/'
-        
-  #get '/', to: 'prueba#index', :as => :root
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
+  Spree::Core::Engine.routes.draw do
+    get "/admin/upload" => "product_reader#index", :as => :admin_import
+    post "/admin/upload" => "product_reader#upload"
+    post "/admin/upload_file" => "product_reader#upload_file", :as => :admin_import_file
+    match '/admin/reports/ingresos' => 'admin/reports#ingresos', :via => [:get, :post], :as =>'ingresos_admin_reports'
+    match '/admin/reports/ganancias' => 'admin/reports#ganancias', :via => [:get, :post], :as =>'ganancias_admin_reports'
+    match '/admin/reports/bodega_pulmon' => 'admin/reports#bodega_pulmon', :via => [:get, :post], :as =>'bodega_pulmon_admin_reports'
+    match '/admin/reports/productos_top' => 'admin/reports#productos_top', :via => [:get, :post], :as =>'productos_top_admin_reports'
+    match '/admin/reports/clientes_top' => 'admin/reports#clientes_top', :via => [:get, :post], :as =>'clientes_top_admin_reports'
+    match '/admin/reports/transacciones' => 'admin/reports#transacciones', :via => [:get, :post], :as =>'transacciones_admin_reports'
+    match '/admin/reports/quiebres_stock' => 'admin/reports#quiebres_stock', :via => [:get, :post], :as =>'quiebres_stock_admin_reports'
+  end
 
-  # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  scope :path => "/api" do
+    get "/disponibles/:username/:password/:sku" => "api#preguntarStock" #Me permite obtener el stock disponible
+    post  "/pedirProducto/:username/:password/:sku"  => "api#enviarProducto" #Me permite enviar producto a la bodega dada
+  end
 
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
-
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
-
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
 end

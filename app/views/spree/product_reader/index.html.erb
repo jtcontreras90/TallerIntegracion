@@ -1,0 +1,93 @@
+<script>
+	$(function(){
+
+		var importAProduct=function(i,data,dataAct){
+			if(i<data.length)
+			{
+				$('#avance').children().first().html(parseInt(i/(data.length-1)*100));
+				$.ajax({
+					url: '<%= admin_import_path %>',
+					data: dataAct,
+					type: 'POST',
+					success: function(_data){
+						$('#resultado ul').append('<li id="#'+dataAct['sku']+'" class="state-'+_data['product']+'"><b>'+dataAct['modelo']+'('+dataAct['marca']+')</b></li>');
+						console.log(dataAct['sku']+": Marca "+dataAct['marca']+"("+_data['marca']+")");
+						$.each(_data['categorias'], function(ii,e){
+							console.log(dataAct['sku']+": Categoría: "+e['name']+ "("+e['categoria']+")");
+						});
+						if (i+1<data.length)
+							importAProduct(i+1,data,data[i+1]);
+					}
+				});
+			}
+		}
+
+		$("#send").click(function(){
+			file=$("#fileImport").val();
+			if(file.substring(file.length-5,file.length).toUpperCase()==".JSON")
+			{
+				var superFile = new FormData();
+				$.each($('#fileImport')[0].files, function(i, file) {
+				    superFile.append('file-'+i, file);
+				});
+
+				$('#error').html('');
+				$('#send').hide();
+				$('#loading').show();
+				$('#avance').show();
+				$('#avance').children().first().html('0');
+				$('#resultado').show();
+				$.ajax({
+					url: '<%= admin_import_file_path%>',
+					data: superFile,
+					type: 'POST',
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: function(data){
+						importAProduct(0,data,data[0]);
+					}
+
+				})
+			}
+			else
+			{
+				$('#error').html('Debe ingresar un archivo válido (formato json)')
+			}
+		})
+
+	});
+</script>
+<style>
+	#error,.error, .state--1{
+		color:#a94442 !important;
+	}
+	#succes, .success, .state-1{
+		color: #3c763d !important;
+	}
+	#warning, .warning, .state-0{
+		color: #8a6d3b !important;
+	}
+	.well{
+		min-height: 20px;
+		padding: 19px;
+		margin-bottom: 20px;
+		background-color: #f5f5f5;
+		border: 1px solid #e3e3e3;
+		border-radius: 4px;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+	}
+	.well-lg{
+		padding: 24px;
+		border-radius: 6px;
+	}
+</style>
+<h1>Import masivo de productos</h1>
+<br><br>
+  <%= file_field_tag :fileImport, accept: 'application/json' %>
+ <br><br><br><br>
+  <%= submit_tag "Importar", id: "send" %><div id="error"></div>
+  <%= image_tag "loading.gif", size: "50x50", id: "loading", style: "display:none;" %>
+  <div id="avance" style="display:none;">Cargando (<span></span>%)</div>
+  <div id="resultado" class="well well-lg" style="display:none;"><ul></ul></div>

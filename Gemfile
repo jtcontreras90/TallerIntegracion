@@ -27,11 +27,24 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 1.2'
 
+gem 'mdb', '~> 0.3.1'
+
+gem 'dropbox-sdk', '~> 1.6.4'
+
+gem 'bson', '~> 2.2.3'
+
+gem 'mongoid', '~> 4.0.0.beta1'
+
+gem 'moped'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
 end
 
+gem 'google_drive'
+
+gem 'whenever', require: false
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -51,7 +64,10 @@ gem 'spree_auth_devise', :git => 'https://github.com/spree/spree_auth_devise.git
 gem 'money', '6.0.1'
 
 gem 'awesome_print'
+
 #gemas para el servidor sftp
 gem 'net-sftp'
-gem 'whenever', :require => false
 #fin de gemas servidor sftp
+
+#Facilita la conexión con cualquier API
+gem 'rest-client'

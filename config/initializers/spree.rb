@@ -7,6 +7,9 @@
 # config.setting_name = 'new value'
 Spree.config do |config|
   config.allow_ssl_in_production = false 
+  config.logo = "logo-central-ahorro.png"
+  config.admin_interface_logo = "logo-central-ahorro.png"
+  config.products_per_page = 100
   # Example:
   # Uncomment to override the default site name.
   # config.site_name = "Spree Demo Site"

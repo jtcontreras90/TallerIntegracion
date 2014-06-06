@@ -16,9 +16,28 @@
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"
 # end
-
 # Learn more: http://github.com/javan/whenever
-
 every 10.minutes do
   runner "Pedido.cargar"
+end
+
+
+every 15.minutes do
+  runner "Pedido.preguntarPedidosPendientes"
+  runner "Bodega.enviarProducto"
+end
+
+every 3.hours do
+	runner "ApiBodega.vaciarBodegaRecepcion"
+end
+
+every 2.hours do
+	runner "ApiBodega.vaciarBodegaPulmon"
+end
+
+every :day, :at => '11:57pm' do
+	runner "ApiBodega.reportarBPulmonDw"
+end
+every :day, :at => '4:30 am' do
+	runner "Database.readcsv"
 end

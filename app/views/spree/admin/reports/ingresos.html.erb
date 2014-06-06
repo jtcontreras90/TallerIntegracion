@@ -1,0 +1,41 @@
+<%content_for :page_title do%>
+	Ingresos del último mes
+<%end%>
+
+<%content_for :page_actions do%>
+	<li><%link_to_with_icon 'icon-arrow-left', Spree.t(:back_to_reports_list), spree.admin_reports_url, :class=>'button'%></li>
+<%end%>
+
+<h1>Resumen</h1>
+<h2>Total de Ingresos: <b>$ <%= @qqq[:sum]%></b></h2>
+<br><br>
+<h1>Ingresos por producto</h1>
+<table>
+	<tr>
+		<td>SKU</td>
+		<td>Ingresos</td>
+	</tr>
+	<tr>
+		<% @q.each do |c|%>
+		<td><%= c._id %></td>
+		<td><%= c.sum_ingresos %></td>
+		<% end %>
+	</tr>
+</table>
+
+
+<br>
+<br><h1>Ingresos por cliente</h1>
+<table>
+	<tr>
+		<td>RUT cliente</td>
+		<td>Ingresos</td>
+	</tr>
+	<tr>
+		<% @qq.each do |c|%>
+		<td><%= c._id %></td>
+		<td><%= c.sum_ingresos %></td>
+		<% end %>
+	</tr>
+</table>
+
