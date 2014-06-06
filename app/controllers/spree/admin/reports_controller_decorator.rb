@@ -1,5 +1,6 @@
 require_dependency 'spree/admin/reports_controller'
 require 'date'
+require 'json'
 Spree::Admin::ReportsController.class_eval do
     ADVANCED_REPORTS ||= {}
     
@@ -13,9 +14,22 @@ Spree::Admin::ReportsController.class_eval do
       def ingresos
          date1 = DateTime.now - 30.days
          date2 = DateTime.now
-         @q=Consultador.agg_attr_sku(Ventaproducto, 'sum', 'ingresos', date1,date2)
-         @qq=Consultador.agg_attr_sku(Ventacliente, 'sum', 'ingresos', date1,date2)
-         @qqq=Consultador.total(Ventacliente,'ingresos',date1,date2)
+         @q=Consultador.agg_attr_sku(Ventaproducto, 'sum', 'ingresos', date1, date2)
+         @skuProductos=[]
+         @ingresosProductos=[]
+         @q.each do |c|
+          @skuProductos.append(c._id)
+          @ingresosProductos.append(c.sum_utilidades)
+         end
+         @qq=Consultador.agg_attr_sku(Ventacliente, 'sum', 'ingresos', date1, date2)
+         @idClientes=[]
+         @ingresosClientes=[]
+         @qq.each do |c|
+          @idClientes.append(c._id)
+          @ingresosClientes.append(c.sum_utilidades)
+         end
+         @qqq=Consultador.total(Ventacliente,'ingresos',date1, date2)
+         @series=[{:name=>"algo", :data=>[1,2,3,4,5,6,7,8,9,10,11,12]}].to_json
       end
       
       def ganancias
