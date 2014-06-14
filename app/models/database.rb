@@ -70,7 +70,6 @@ class Database
 		out = @client.get_file('/' + src)
 		open(dest, 'w'){|f| f.puts out.force_encoding('UTF-8') }
 		
-		# puts "wrote file #{dest}."
 		# {:Id=>"4039", :SKU=>"000000000880159182", :Precio=>" 19119.00000",
 		#  :"Fecha Actualización"=>" 02/11/2015", :"Fecha Vigencia"=>" 04/09/2015", 
 		#  :"Costo Producto"=>" 12906.00000", :"Costo Traspaso"=>" 229.00000", :"Costo Almacenaje Ext"=>" 30.00000"}
@@ -84,29 +83,14 @@ class Database
 	        pnew.id_pricing = i[:Id].to_i
 	        pnew.sku = i[:SKU]
 	        pnew.precio = i[:Precio].to_i
-	        pnew.fecha_actualizacion = i[:"Fecha Actualización"]
-	        pnew.fecha_vigencia = i[:"Fecha Vigencia"]
+	        pnew.fecha_actualizacion = Date.strptime(i[:"Fecha Actualización"].strip,"%m/%d/%Y")
+	        pnew.fecha_vigencia = Date.strptime(i[:"Fecha Vigencia"].strip,"%m/%d/%Y")
 	        pnew.costo_producto = i[:"Costo Producto"].to_i
 	        pnew.costo_traspaso = i[:"Costo Traspaso"].to_i
 	        pnew.costo_almacenaje = i[:"Costo Almacenaje Ext"].to_i
 	        pnew.save
 		end
 
-		#prueba(dest)
-
-		#Eliminar archivo .csv antiguo
-		# begin
-		# 	puts "Eliminando archivo antiguo"
-		# 	@client.file_delete("/Grupo9/dbprecios.csv")
-		# 	puts "Archivo eliminado exitosamente"
-		# rescue
-		# 	puts "Archivo no pudo eliminar, probablemente porque no existe"
-		# end
-
-		#Subir el archivo .csv a dropbox
-		# puts "Subiendo archivo a dropbox"
-		# @client.put_file("/Grupo9/dbprecios.csv", open('hola.csv'))
-		# puts "Archivo subido exitosamente"
       	Rails.logger.info "[SCHEDULE][DATABASE.ACCDB_TO_CSV]Finish at #{Time.now}"
     end
 

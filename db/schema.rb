@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140519141527) do
+ActiveRecord::Schema.define(version: 20140614212238) do
 
   create_table "bodegas", force: true do |t|
     t.string   "name"
@@ -34,6 +34,9 @@ ActiveRecord::Schema.define(version: 20140519141527) do
     t.integer  "pedidoID"
     t.boolean  "enviado"
     t.boolean  "quebrado"
+    t.string   "direccion"
+    t.integer  "cant_vendida"
+    t.integer  "cant_quebrada"
   end
 
   create_table "pricings", force: true do |t|
@@ -346,8 +349,8 @@ ActiveRecord::Schema.define(version: 20140519141527) do
   add_index "spree_preferences", ["key"], name: "index_spree_preferences_on_key", unique: true
 
   create_table "spree_prices", force: true do |t|
-    t.integer  "variant_id",                         null: false
-    t.decimal  "amount",     precision: 8, scale: 2
+    t.integer  "variant_id",                          null: false
+    t.decimal  "amount",     precision: 14, scale: 2
     t.string   "currency"
     t.datetime "deleted_at"
   end
@@ -760,18 +763,18 @@ ActiveRecord::Schema.define(version: 20140519141527) do
   add_index "spree_users", ["spree_api_key"], name: "index_spree_users_on_spree_api_key"
 
   create_table "spree_variants", force: true do |t|
-    t.string   "sku",                                     default: "",    null: false
-    t.decimal  "weight",          precision: 8, scale: 2, default: 0.0
-    t.decimal  "height",          precision: 8, scale: 2
-    t.decimal  "width",           precision: 8, scale: 2
-    t.decimal  "depth",           precision: 8, scale: 2
+    t.string   "sku",                                      default: "",    null: false
+    t.decimal  "weight",          precision: 8,  scale: 2, default: 0.0
+    t.decimal  "height",          precision: 8,  scale: 2
+    t.decimal  "width",           precision: 8,  scale: 2
+    t.decimal  "depth",           precision: 8,  scale: 2
     t.datetime "deleted_at"
-    t.boolean  "is_master",                               default: false
+    t.boolean  "is_master",                                default: false
     t.integer  "product_id"
-    t.decimal  "cost_price",      precision: 8, scale: 2
+    t.decimal  "cost_price",      precision: 14, scale: 2
     t.integer  "position"
     t.string   "cost_currency"
-    t.boolean  "track_inventory",                         default: true
+    t.boolean  "track_inventory",                          default: true
     t.integer  "tax_category_id"
     t.datetime "updated_at"
   end
