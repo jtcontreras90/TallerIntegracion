@@ -52,12 +52,22 @@ class Pedido < ActiveRecord::Base
         reservadosTotales=Reserva.getReservasXSKU(sku)
         reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
         stockDisponible=ApiBodega.obtenerStock(sku)
+        stockDisponibleCliente=[[stockDisponible-reservadosTotales,0].max+reservadosCliente,stockDisponible].min
         if pedido.fechaLimite<DateTime.now()
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
+          pedido.cant_quebrada=cantidad-pedido.cant_vendida
           pedido.save
-          if stockDisponible<pedido.cantidad
-            Bodega.pedirProducto(pedido.sku,pedido.cantidad-stockDisponible)
+          if pedido.cant_vendida>0
+            #Vender el producto
+            precios=Pricing.findBySKU(sku)
+            variant=Spree::Variant.where(sku: sku).first()
+            venta=Venta.new(:spree_variant_id=>variant.id,
+            :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
+            :ingreso=>precios.precio*pedido.cant_vendida,
+            :pedido_id=>pedido.id,
+            :fecha=>DateTime.now())
+            venta.save
           end
         else
 
@@ -67,17 +77,13 @@ class Pedido < ActiveRecord::Base
         # puts "Cantidad disponible para el cliente: #{[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
         # puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
         # puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
-          if pedido.cantidad<stockDisponible and pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente
+          if 0<stockDisponibleCliente
+            if stockDisponibleCliente<(pedido.cantidad-pedido.cant_vendida)
+              cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,pedido.cantidad-stockDisponibleCliente)
+              
+            end
+            cantidadVendida=[[stockDisponible-reservadosTotales,0].max+reservadosCliente,(pedido.cantidad-pedido.cant_vendida)].min
             Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
-            #Vender el producto
-            precios=Pricing.findBySKU(sku)
-            variant=Spree::Variant.where(sku: sku).first()
-            venta=Venta.new(:spree_variant_id=>variant.id,
-            :utilidad=>precios.precio-precios.costo_producto,
-            :ingreso=>precios.precio,
-            :pedido_id=>pedido.id,
-            :fecha=>DateTime.now())
-            venta.save
             Reserva.quitarReservasXCliente(sku,pedido.rut,[pedido.cantidad,reservadosCliente].min)
             vtiger=Vtiger.new
             direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
