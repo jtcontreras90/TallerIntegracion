@@ -15,7 +15,7 @@ class Pedido < ActiveRecord::Base
       #puts file.name
         pedidoID=file.name.split('_')[1].to_i
         if file.name!=".." and file.name!="."
-          #if Time.at(file.attributes.mtime)>revision
+          if Time.at(file.attributes.mtime)>revision
           raw =sftp.download!("Pedidos/"+file.name)
           doc = Document.new(raw)
           fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
@@ -35,7 +35,7 @@ class Pedido < ActiveRecord::Base
             end
           end
         vtiger.logout
-        #end
+        end
         end
       end
     end
@@ -55,7 +55,7 @@ class Pedido < ActiveRecord::Base
           pedido.quebrado=true
           pedido.save
           if stockDisponible<pedido.cantidad
-            Bodega.pedirProducto(pediodo.sku,pedido.cantidad-stockDisponible)
+            Bodega.pedirProducto(pedido.sku,pedido.cantidad-stockDisponible)
           end
         else
 

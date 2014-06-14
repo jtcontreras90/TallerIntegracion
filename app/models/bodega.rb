@@ -54,7 +54,7 @@
           almacenId="53571e54682f95b80b786eb9"
           pass="5HUKt4Ltn/A3cypvmotC2swYC3Y=" #sha1 base 64
           response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad }
-          if not JSON.parse(response.body).has_key?('error')
+          if not response.body.has_key?('error')
             cantidad=0
             break
           end
