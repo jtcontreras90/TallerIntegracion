@@ -40,6 +40,7 @@ end
 
 every :day, :at => '11:57pm' do
 	runner "ApiBodega.reportarBPulmonDw" #Pendiente
+  runner "Venta.generarReportes"
 end
 every :day, :at => '4:30 am' do
 	runner "Database.readcsv"
