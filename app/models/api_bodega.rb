@@ -34,21 +34,21 @@ class ApiBodega < ActiveRecord::Base
 		hash = (Base64.encode64("#{OpenSSL::HMAC.digest('sha1',key, signature)}"))
 		response= RestClient.get "http://bodega-integracion-2014.herokuapp.com/skusWithStock?almacenId=#{almacenId}", {:Authorization => "UC grupo9:#{hash}"}
 		r=JSON.parse response
-		
 		r
 	end
+
 	# dado un almacen y un sku, retorna todos los productos del almacen que tengan ese sku de la siguiente manera: 
 	# {
- #    "grupo": 9,
- #    "almacen": "53571e54682f95b80b786ebb",
- #    "sku": "2586731",
- #    "_id": "53571e55682f95b80b7899b0",
- #    "direccion": "",
- #    "precio": 0,
- #    "despachado": false,
- #    "costo": 0,
- #    "__v": 0
- #  	}
+	#    "grupo": 9,
+	#    "almacen": "53571e54682f95b80b786ebb",
+	#    "sku": "2586731",
+	#    "_id": "53571e55682f95b80b7899b0",
+	#    "direccion": "",
+	#    "precio": 0,
+	#    "despachado": false,
+	#    "costo": 0,
+	#    "__v": 0
+	# }
 	def self.getStock(almacenId, sku)
 		signature = "GET#{almacenId}#{sku}"
 		key= 'wjNBuMv2'
@@ -57,6 +57,7 @@ class ApiBodega < ActiveRecord::Base
 		r=JSON.parse response
 		r
 	end
+
 	#mueve un producto dado a una bodega dada de destino retornando el almacen y el producto o error(producto no encontrado, almacen no encontrado, falta de espacio)
 	def self.moverStock(almacenId, productoId)      
 		signature = "POST#{productoId}#{almacenId}"
@@ -84,10 +85,10 @@ class ApiBodega < ActiveRecord::Base
 		r
 		
 	end
-		#Envía un stock a un cliente desde la bodega de despacho
-		#Retorna un bool indicando si el producto fue entragado correctamente o no. 
-		#Error producto no encontrado. ∫
 
+	#Envía un stock a un cliente desde la bodega de despacho
+	#Retorna un bool indicando si el producto fue entragado correctamente o no. 
+	#Error producto no encontrado.
 	def self.despacharStock(productoId, direccion, precio, pedidoId)
 		signature = "DELETE#{productoId}#{direccion}#{precio}#{pedidoId}"
 		#puts signature
@@ -97,6 +98,7 @@ class ApiBodega < ActiveRecord::Base
 		#{'productoId' => productoId, 'direccion' => direccion,'precio' => precio, 'pedidoId' => pedidoId},
 		parametros={productoId: productoId,direccion: direccion,precio: precio,pedidoId: pedidoId}
 		#response= RestClient.delete "http://bodega-integracion-2014.herokuapp.com/stock?#{parametros.to_query}", {:Authorization => "UC grupo9:#{hash}"}
+		puts "DELETE: http://bodega-integracion-2014.herokuapp.com/stock headers: (:Authorization => 'UC grupo9:#{hash}) payload: #{parametros} "
 		response=RestClient::Request.execute(:method => 'delete', :url => "http://bodega-integracion-2014.herokuapp.com/stock",:headers =>{:Authorization => "UC grupo9:#{hash}"}, :payload =>parametros)
 		#response= RestClient.delete 'http://bodega-integracion-2014.herokuapp.com/stock',{'Authorization' => hash,:accept => :json, :params=>{:productId=>productId, :dirección=>dirección, :precio=>precio,:pedidoId=>pedidoId}}
 		#puts response
@@ -327,23 +329,25 @@ class ApiBodega < ActiveRecord::Base
     	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Finish at #{Time.now}"
 		
 	end
+
 	# suma los costos de todos los productos de la bodega pulmon 
 	def self.reportarBPulmonDw
 		#costo diario de la bodega
     	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
 		costoDia=0
+
+		#Obtenemos los skus de la bodega pulmon que tienen stock
 		skus=ApiBodega.getSkusWithStock(@@PULMON)
+		puts "Pasa por aqui"
 		skus.each do |i|
-			j=0
-			while j<i["total"]
-				productos=ApiBodega.getStock(@@PULMON, i["_id"])
-				productos.each do |k|
-					if j<i["total"]
-						
-						costoDia=ApiBodega.moverProductoBodegaCentra1(k["costo"])+costoDia
-						j=j+1
-					end
-				end
+			#Iniciamos un contador
+			# j=0
+			# while j<i["total"] #i[total] corresponde a la cantidad total de stock en el almacen para el sku dado
+			un_sku=i["_id"]
+			productos=ApiBodega.getStock(@@PULMON, un_sku) #Obtener todos los id de los productos con sku dado en bodega dada
+			productos.each do |k|
+				puts "Productos con sku #{un_sku}, id #{k['_id']}"				
+				costoDia=k["costo"].to_i+costoDia
 			end
 		end	
 		#fecha que se reporta al datawerehouse
@@ -357,7 +361,6 @@ class ApiBodega < ActiveRecord::Base
 		Costobodegapulmon.agregar(costoDia, fecha,cantTotal)
 
     	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
-		
 	end
 
 

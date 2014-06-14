@@ -18,16 +18,17 @@
 # end
 # Learn more: http://github.com/javan/whenever
 every 10.minutes do
-  	runner "Pedido.cargar" #ok - no cargó ningun stfp porque no habían disponibles
+  	runner "Pedido.cargar" #ok
 end
 
 every 2.hours do 
-	runner "Pedido.preguntarPedidosPendientes" #ok - revisar conexión con otros
+	runner "Pedido.preguntarPedidosPendientes" #revisar conexión con otros. Funciona en 1 de 3 grupos
+											   #revisar despacharStock de ApiBodega. Por alguna razón se cae
 end
 
 
 every 15.minutes do
- 	runner "Bodega.enviarProducto" #ok - no se envió nada porque no habían pendientes
+ 	runner "Bodega.enviarProducto" #ok
 end
 
 every 3.hours do
@@ -39,8 +40,8 @@ every 2.hours do
 end
 
 every :day, :at => '11:57pm' do
-	runner "ApiBodega.reportarBPulmonDw" #Pendiente
+	runner "ApiBodega.reportarBPulmonDw" #ok
 end
 every :day, :at => '4:30 am' do
-	runner "Database.readcsv"
+	runner "Database.accdb_to_csv" #ok
 end
