@@ -11,6 +11,7 @@ Spree::Admin::ReportsController.class_eval do
       Spree::Admin::ReportsController.add_available_report!(:transacciones,"Transacciones")
       Spree::Admin::ReportsController.add_available_report!(:quiebres_stock,"Quiebres de Stock")
       Spree::Admin::ReportsController.add_available_report!(:bodega_pulmon,"Costo Bodega Pulmón")
+      Spree::Admin::ReportsController.add_available_report!(:tweets,"Tweets de la compañía")
       def ingresos
          hoy=DateTime.now
          date1 = hoy - hoy.day.days
@@ -132,5 +133,7 @@ Spree::Admin::ReportsController.class_eval do
          @qq=Consultador.total(Costobodegapulmon,'cantidad_productos',date1,date2)
          @total = @qq[:sum]
          @sum = @q[:sum]
+      end
+      def tweets
       end
 end

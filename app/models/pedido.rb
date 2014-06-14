@@ -83,13 +83,13 @@ class Pedido < ActiveRecord::Base
           if stockDisponibleCliente<(pedido.cantidad-pedido.cant_vendida)
             cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido-cant_vendida)-stockDisponibleCliente)
             if cantidadVendida>=pedido.cantidad-pedido-cant_vendida
-            pedido.enviado=true
+              pedido.enviado=true
             end
-          pedido.cant_vendida=pedido.cant_vendida+cantidadVendida
+            pedido.cant_vendida=pedido.cant_vendida+cantidadVendida
           else
-          cantidadVendida=pedido.cantidad-pedido.cant_vendida
-          pedido.enviado=true
-          pedido.cant_vendida=pedido.cantidad
+            cantidadVendida=pedido.cantidad-pedido.cant_vendida
+            pedido.enviado=true
+            pedido.cant_vendida=pedido.cantidad
           end
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
