@@ -5,10 +5,10 @@ include REXML
 class Pedido < ActiveRecord::Base
 
   belongs_to :venta, :class_name => "Venta", :foreign_key => 'pedido_id'
-  def self.cargar
+  def self.cargar(less=600)
     Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Begin at #{Time.now}"
     Net::SFTP.start('integra.ing.puc.cl','grupo9',:password=>'3045kdk') do |sftp|
-      revision = (Time.now - 600)
+      revision = (Time.now - less)
       nombre=""
       cantidad=0
       sftp.dir.foreach("Pedidos") do |file|
