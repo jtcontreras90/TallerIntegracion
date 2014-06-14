@@ -84,13 +84,12 @@ class Database
 	        pnew.id_pricing = i[:Id].to_i
 	        pnew.sku = i[:SKU]
 	        pnew.precio = i[:Precio].to_i
-	        pnew.fecha_actualizacion = i[:"Fecha Actualización"]#Da$
-	        pnew.fecha_vigencia = i[:"Fecha Vigencia"]#Date.strptim$
-	        pnew.costo_producto = i[:"Costo Producto"].to_i#row[5].$
-	        pnew.costo_traspaso = i[:"Costo Traspaso"].to_i#row[6].$
-	        pnew.costo_almacenaje = i[:"Costo Almacenaje Ext"].to_i$
+	        pnew.fecha_actualizacion = i[:"Fecha Actualización"]
+	        pnew.fecha_vigencia = i[:"Fecha Vigencia"]
+	        pnew.costo_producto = i[:"Costo Producto"].to_i
+	        pnew.costo_traspaso = i[:"Costo Traspaso"].to_i
+	        pnew.costo_almacenaje = i[:"Costo Almacenaje Ext"].to_i
 	        pnew.save
-	        #puts "#{i[:Id]} #{i[:SKU]} #{i[:Precio]} #{i[:"Fecha A$
 		end
 
 		#prueba(dest)
