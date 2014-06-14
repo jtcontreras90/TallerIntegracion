@@ -19,7 +19,11 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
+  adapter: postgresql
+  encoding: utf8
+  database: integra
   pool: 5
   timeout: 5000
+  host: localhost
+  username: root
+  password: 12qwaszx12qw

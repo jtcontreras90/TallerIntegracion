@@ -14,5 +14,5 @@ Bodega.create([{name: 'grupo1', password: 'KB74LrBL'},
                {name: 'grupo7', password: 'LRZjGEM5'},
                {name: 'grupo8', password: 'crtwjh4J'}])
 
-Spree::Core::Engine.load_seed if defined?(Spree::Core)
-Spree::Auth::Engine.load_seed if defined?(Spree::Auth)
+#Spree::Core::Engine.load_seed if defined?(Spree::Core)
+#Spree::Auth::Engine.load_seed if defined?(Spree::Auth)

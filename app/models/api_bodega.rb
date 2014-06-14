@@ -6,6 +6,10 @@ class ApiBodega < ActiveRecord::Base
 	require 'cgi'
 	require 'openssl'
 
+	@@RECEPCION='53571e54682f95b80b786eb9'
+	@@DESPACHO='53571e54682f95b80b786eba'
+	@@PULMON='53571e58682f95b80b78d133'
+
 	# retorna todos los almacenes de la bodega como Json: 
 	# {"grupo"=>9, "_id"=>"53571e54682f95b80b786eb9", "pulmon"=>false, "despacho"=>false, "recepcion"=>true, "totalSpace"=>505, "usedSpace"=>1, "__v"=>0}
 	# {"grupo"=>9, "_id"=>"53571e54682f95b80b786eba", "pulmon"=>false, "despacho"=>true, "recepcion"=>false, "totalSpace"=>211, "usedSpace"=>10, "__v"=>0}
@@ -136,12 +140,12 @@ class ApiBodega < ActiveRecord::Base
 	# mueve un producto a la bodega de despacho
 	def self.moverProductoBodegaDespacho(productoId)
 		
-		ApiBodega.moverStock('53571e54682f95b80b786eba', productoId)
+		ApiBodega.moverStock(@@DESPACHO, productoId)
 	end
 	# mueve un producto a la bodega de recepción
 	def self.moverProductoBodegaRecepcion(productoId)
 		
-		ApiBodega.moverStock('53571e54682f95b80b786eb9', productoId)
+		ApiBodega.moverStock(@@RECEPCION, productoId)
 	end
 	# mueve un producto a la bodega central1
 	def self.moverProductoBodegaCentra1(productoId)
@@ -161,7 +165,7 @@ class ApiBodega < ActiveRecord::Base
 		almacenes.each do |j|
 			productos=ApiBodega.getStock(j["_id"],sku)
 			productos.each	do |k|
-				if i<cantidad and j["_id"]!='53571e54682f95b80b786eba'
+				if i<cantidad and j["_id"]!=@@DESPACHO
 					ApiBodega.moverProductoBodegaDespacho(k["_id"])
 					i=i+1 
 				end
@@ -178,7 +182,7 @@ class ApiBodega < ActiveRecord::Base
    			almacenes.each do |j|
    				productos=ApiBodega.getStock(j["_id"],sku)
    				productos.each	do |k|
-   					if i<cantidad and j["_id"]!='53571e54682f95b80b786eb9'
+   					if i<cantidad and j["_id"]!=@@RECEPCION
    						ApiBodega.moverProductoBodegaRecepcion(k["_id"])
    						i=i+1 
    					end
@@ -196,7 +200,7 @@ class ApiBodega < ActiveRecord::Base
 		#puts "Pasa por aquí"
 		i = 0
 		j = 0
-		productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
+		productos=ApiBodega.getStock(@@DESPACHO, sku)
 		#while i< cantidad do
 			productos.each_with_index do |element,index|
 				#puts "Cantidad enviada actual: #{i}"
@@ -218,7 +222,7 @@ class ApiBodega < ActiveRecord::Base
 		ApiBodega.moverProductosBodegaDespacho(sku, cantidad)
 		i = 0
 		#while i< cantidad do
-			productos=ApiBodega.getStock('53571e54682f95b80b786eba', sku)
+			productos=ApiBodega.getStock(@@DESPACHO, sku)
 			productos.each do |j|
 				if i<cantidad 
    						ApiBodega.despacharStock(j["_id"], direccion,precio,pedidoId)
@@ -233,11 +237,12 @@ class ApiBodega < ActiveRecord::Base
 	def self.vaciarBodegaRecepcion
     	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Begin at #{Time.now}"
 		begin
-			skus=ApiBodega.getSkusWithStock('53571e54682f95b80b786eb9')
+			skus=ApiBodega.getSkusWithStock(@@RECEPCION)
 			skus.each do |i|
+				Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]Trying to move product with sku #{i}"
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e54682f95b80b786eb9', i["_id"])
+					productos=ApiBodega.getStock(@@RECEPCION, i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -248,12 +253,13 @@ class ApiBodega < ActiveRecord::Base
 				end
 			end	
 		rescue Exception => e
+			Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGARECEPCION]There was an error: #{e}"
 			begin
-				skus=ApiBodega.getSkusWithStock('53571e54682f95b80b786eb9')
+				skus=ApiBodega.getSkusWithStock(@@RECEPCION)
 				skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e54682f95b80b786eb9', i["_id"])
+					productos=ApiBodega.getStock(@@RECEPCION, i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -278,11 +284,12 @@ class ApiBodega < ActiveRecord::Base
 	def self.vaciarBodegaPulmon
     	Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Begin at #{Time.now}"
 		begin
-			skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
+			skus=ApiBodega.getSkusWithStock(@@PULMON)
 			skus.each do |i|
+				Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]Trying to move product with sku #{i}"
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+					productos=ApiBodega.getStock(@@PULMON, i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -293,12 +300,13 @@ class ApiBodega < ActiveRecord::Base
 				end
 			end	
 		rescue Exception => e
+			Rails.logger.info "[SCHEDULE][APIBODEGA.VACIARBODEGAPULMON]There was an error: #{e}"
 			begin
-				skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
+				skus=ApiBodega.getSkusWithStock(@@PULMON)
 				skus.each do |i|
 				j=0
 				while j<i["total"]
-					productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+					productos=ApiBodega.getStock(@@PULMON, i["_id"])
 					productos.each do |k|
 						if j<i["total"]
 							
@@ -324,11 +332,11 @@ class ApiBodega < ActiveRecord::Base
 		#costo diario de la bodega
     	Rails.logger.info "[SCHEDULE][APIBODEGA.REPORTARBPULMONDW]Begin at #{Time.now}"
 		costoDia=0
-		skus=ApiBodega.getSkusWithStock('53571e58682f95b80b78d133')
+		skus=ApiBodega.getSkusWithStock(@@PULMON)
 		skus.each do |i|
 			j=0
 			while j<i["total"]
-				productos=ApiBodega.getStock('53571e58682f95b80b78d133', i["_id"])
+				productos=ApiBodega.getStock(@@PULMON, i["_id"])
 				productos.each do |k|
 					if j<i["total"]
 						
@@ -356,12 +364,12 @@ class ApiBodega < ActiveRecord::Base
 
 	def self.run
 		#Bodega de recepción
-		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eb9')
+		# ApiBodega.getSkusWithStock(@@RECEPCION)
 		# #Para probar los despachos
-		# ApiBodega.getStock('53571e54682f95b80b786eba', '2586731')
-		# ApiBodega.getSkusWithStock("53571e54682f95b80b786eba")
+		# ApiBodega.getStock(@@DESPACHO, '2586731')
+		# ApiBodega.getSkusWithStock(@@DESPACHO)
 		# ApiBodega.despacharStock('53571e55682f95b80b7899aa', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
-		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		# ApiBodega.getSkusWithStock(@@DESPACHO)
 		
 		
 
@@ -371,20 +379,20 @@ class ApiBodega < ActiveRecord::Base
 		#ApiBodega.getAlmacenes()
 		#ApiBodega.vaciarBodegaRecepcion()
 		#ApiBodega.getAlmacenes()
-		#ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		#ApiBodega.getSkusWithStock(@@DESPACHO)
 		#ApiBodega.despacharProducto( '3517982', 1, 'queincha', '235234', '5555555555555')
-		#ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
-		#ApiBodega.getStock('53571e54682f95b80b786eba', '3517982' )
+		#ApiBodega.getSkusWithStock(@@DESPACHO)
+		#ApiBodega.getStock(@@DESPACHO, '3517982' )
 
 		# #mover stock a la bodega de recepción del grupo de jose
 		# ApiBodega.moverStockBodega('53571d58682f95b80b76e5ea', '53571e55682f95b80b7899aa')
-		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		# ApiBodega.getSkusWithStock(@@DESPACHO)
 
 		#ApiBodega.getStock("53571e54682f95b80b786ebb", '2586731')
 		#ApiBodega.moverBodegaDespacho('53571e55682f95b80b789979')
 
-		# ApiBodega.getStock('53571e54682f95b80b786eba','2586731')
-		# ApiBodega.getSkusWithStock('53571e54682f95b80b786eba')
+		# ApiBodega.getStock(@@DESPACHO,'2586731')
+		# ApiBodega.getSkusWithStock(@@DESPACHO)
 		# ApiBodega.despacharStock('53571e55682f95b80b789997', 'Quinchamali 1433, Las Condes', '10000', '543535345345')
 	
 

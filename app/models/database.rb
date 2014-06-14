@@ -22,9 +22,9 @@ class Database
 		 	puts i
 		end
 
-		csv = execute "mdb-export -D '%F %T' -d , DBPrecios.accdb  Pricing > hola.csv"
+		# csv = execute "mdb-export -D '%F %T' -d , DBPrecios.accdb  Pricing > hola.csv"
 		
-		puts "Archivo csv creado"
+		# puts "Archivo csv creado"
 
 	end
 	#def self.findBySKU(table,sku)
@@ -48,6 +48,8 @@ class Database
     end
 
     def self.accdb_to_csv
+      	Rails.logger.info "[SCHEDULE][DATABASE.ACCDB_TO_CSV]Begin at #{Time.now}"
+
     	#Iniciar la sesión
 
 		@session = DropboxSession.new(@@APP_KEY, @@APP_SECRET)
@@ -68,17 +70,45 @@ class Database
 		out = @client.get_file('/' + src)
 		open(dest, 'w'){|f| f.puts out.force_encoding('UTF-8') }
 		
-		puts "wrote file #{dest}."
+		# puts "wrote file #{dest}."
+		# {:Id=>"4039", :SKU=>"000000000880159182", :Precio=>" 19119.00000",
+		#  :"Fecha Actualización"=>" 02/11/2015", :"Fecha Vigencia"=>" 04/09/2015", 
+		#  :"Costo Producto"=>" 12906.00000", :"Costo Traspaso"=>" 229.00000", :"Costo Almacenaje Ext"=>" 30.00000"}
+		database = Mdb.open(dest)
+		pricing= database.read("Pricing")
+		pricing.each do |i|
+	        puts i
+	        p=Pricing.where(id_pricing: i[:Id].to_i)
+	        p.delete_all
+	        pnew=Pricing.new
+	        pnew.id_pricing = i[:Id].to_i
+	        pnew.sku = i[:SKU]
+	        pnew.precio = i[:Precio].to_i
+	        pnew.fecha_actualizacion = i[:"Fecha Actualización"]#Da$
+	        pnew.fecha_vigencia = i[:"Fecha Vigencia"]#Date.strptim$
+	        pnew.costo_producto = i[:"Costo Producto"].to_i#row[5].$
+	        pnew.costo_traspaso = i[:"Costo Traspaso"].to_i#row[6].$
+	        pnew.costo_almacenaje = i[:"Costo Almacenaje Ext"].to_i$
+	        pnew.save
+	        #puts "#{i[:Id]} #{i[:SKU]} #{i[:Precio]} #{i[:"Fecha A$
+		end
 
+		#prueba(dest)
 
-		prueba(dest)
+		#Eliminar archivo .csv antiguo
+		# begin
+		# 	puts "Eliminando archivo antiguo"
+		# 	@client.file_delete("/Grupo9/dbprecios.csv")
+		# 	puts "Archivo eliminado exitosamente"
+		# rescue
+		# 	puts "Archivo no pudo eliminar, probablemente porque no existe"
+		# end
 
 		#Subir el archivo .csv a dropbox
-		puts "Subiendo archivo a dropbox"
-		@client.put_file("/Grupo9/dbprecios.csv", open('hola.csv'))
-		puts "Archivo subido exitosamente"
-
-		rails Logger.info "#{Time.now}: Termino exitosamente"
+		# puts "Subiendo archivo a dropbox"
+		# @client.put_file("/Grupo9/dbprecios.csv", open('hola.csv'))
+		# puts "Archivo subido exitosamente"
+      	Rails.logger.info "[SCHEDULE][DATABASE.ACCDB_TO_CSV]Finish at #{Time.now}"
     end
 
     def self.readcsv

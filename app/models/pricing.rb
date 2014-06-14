@@ -2,9 +2,9 @@ class Pricing < ActiveRecord::Base
 	
 	 def self.findBySKU(sku)
 
-	 	p=Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now)
+	 	p=Pricing.where("sku like ? and fecha_actualizacion <= ? and fecha_vigencia > ?","%#{sku}%",DateTime.now,DateTime.now).first
 	 	if p
-	 		return p.inspect
+	 		return p
 	 	else
 	 		return p
 	 	end
