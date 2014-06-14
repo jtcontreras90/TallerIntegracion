@@ -5,8 +5,10 @@ TallerIntegracion::Application.routes.draw do
   # If you would like to change where this engine is mounted, simply change the :at option to something different.
   #
   # We ask that you don't use the :as option here, as Spree relies on it being the default of "spree"
+  get '/map/maps' => 'map#maps'
   mount Spree::Core::Engine, :at => '/'
   Spree::Core::Engine.routes.draw do
+
     get "/admin/upload" => "product_reader#index", :as => :admin_import
     post "/admin/upload" => "product_reader#upload"
     post "/admin/upload_file" => "product_reader#upload_file", :as => :admin_import_file
