@@ -52,9 +52,10 @@ module Spree
 				var['marca']=0
 			end
 
-			if t and p and not t.products.where(product: p)
+			begin
 				p.taxons << t
 				p.save
+			rescue
 			end
 
 			var['categorias']=[]
@@ -71,9 +72,11 @@ module Spree
 					var['categorias']<<{name: cat, categoria: 0 }
 				end
 
-				if t and p and not t.products.where(product: p)
+				#if t and p and not t.products.where(product_id: p.id).count > 0
+				begin
 					p.taxons << t
 					p.save
+				rescue
 				end
 			end
 

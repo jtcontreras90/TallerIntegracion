@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: MyString
+  almacenId: MyString
+  sku: MyString
+  cantidad: 1
+  costotransferencia: 1
+  sent: false
+
+two:
+  user: MyString
+  almacenId: MyString
+  sku: MyString
+  cantidad: 1
+  costotransferencia: 1
+  sent: false

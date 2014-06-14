@@ -4,8 +4,13 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.4'
 
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+group :development do
+	gem 'sqlite3'
+end
 
+group :production do
+	gem 'pg'
+end
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.2'
 
@@ -34,6 +39,8 @@ gem 'dropbox-sdk', '~> 1.6.4'
 gem 'bson', '~> 2.2.3'
 
 gem 'mongoid', '~> 4.0.0.beta1'
+
+gem 'moped'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.

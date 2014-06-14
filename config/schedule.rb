@@ -17,20 +17,31 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 # Learn more: http://github.com/javan/whenever
-
 every 10.minutes do
-  runner "Pedido.cargar"
-  runner "Pedido.preguntarPedidosPendientes"
+  	runner "Pedido.cargar" #ok - no cargó ningun stfp porque no habían disponibles
 end
 
-every 1.hour do
-	runner "ApiBodega.vaciarBodegaRecepcion"
-end
-every 1.hour do
-	runner "ApiBodega.vaciarBodegaPulmon"
+every 2.hours do 
+	runner "Pedido.preguntarPedidosPendientes" #ok - revisar conexión con otros
 end
 
 
- # every 1.hours do
- # 	runner "Database.readcsv"
- # end
+every 15.minutes do
+ 	runner "Bodega.enviarProducto" #ok - no se envió nada porque no habían pendientes
+end
+
+every 3.hours do
+  	runner "ApiBodega.vaciarBodegaRecepcion" #ok
+end
+
+every 2.hours do
+	runner "ApiBodega.vaciarBodegaPulmon" #ok
+end
+
+every :day, :at => '11:57pm' do
+	runner "ApiBodega.reportarBPulmonDw" #Pendiente
+  runner "Venta.generarReportes"
+end
+every :day, :at => '4:30 am' do
+	runner "Database.readcsv"
+end
