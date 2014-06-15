@@ -71,3 +71,12 @@ gem 'net-sftp'
 
 #Facilita la conexión con cualquier API
 gem 'rest-client'
+
+
+#Twitter gems
+gem 'twitter'
+#Twitter gems
+
+#googl gem - Google shortener
+gem 'googl'
+#
