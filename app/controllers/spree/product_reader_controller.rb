@@ -26,6 +26,7 @@ module Spree
 				p.sku=params[:sku]
 				p.description=params[:descripcion]
 				p.price=params[:precio][:internet]
+				p.internet_price=params[:precio][:internet]
 				p.available_on=Time.now
 				p.tax_category_id=1
 				p.shipping_category_id=1
