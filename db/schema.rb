@@ -11,7 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140614212238) do
+
 
   create_table "bodegas", force: true do |t|
     t.string   "name"
