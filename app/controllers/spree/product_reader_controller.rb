@@ -26,12 +26,17 @@ module Spree
 				p.sku=params[:sku]
 				p.description=params[:descripcion]
 				p.price=params[:precio][:internet]
+				p.internet_price=params[:precio][:internet]
 				p.available_on=Time.now
 				p.tax_category_id=1
 				p.shipping_category_id=1
 				p.normal_price=params[:precio][:normal]
 				if p.save
 					i=Spree::Image.create({:attachment => open(URI.parse(params[:imagen])),:viewable => p.master})
+					s=p.stock_items.first
+					s['count_on_hand']=0
+					s.backorderable=false
+					s.save
 					var['product']=1
 				else
 					var['product']=-1
