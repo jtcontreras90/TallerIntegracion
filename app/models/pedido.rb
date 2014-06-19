@@ -9,6 +9,7 @@ class Pedido < ActiveRecord::Base
     Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Begin at #{Time.now}"
     Net::SFTP.start('integra.ing.puc.cl','grupo9',:password=>'3045kdk') do |sftp|
       revision = (Time.now - less)
+      puts revision
       nombre=""
       cantidad=0
       sftp.dir.foreach("Pedidos") do |file|
@@ -32,11 +33,9 @@ class Pedido < ActiveRecord::Base
                 sku=element.elements['sku'].text.strip
                 unidad=element.elements['cantidad'].attributes['unidad']
                 cantidad=element.elements['cantidad'].text.to_f
-                vtiger=Vtiger.new
-                direccion=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
+                direccion=vtiger.direccionByRutAndDireccionId(rut,direccionID)
                 direccion=direccion['calle']+', '+direccion['ciudad']+', '+direccion['region']
-                vtiger.logout
-                pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado => false, :quebrado => false, :direccion => direccion, :cant_vendida=>0, :cant_quebrada=>0)
+                pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false, :direccion=>direccion, :cant_vendida=>0, :cant_quebrada=>0)
                 pedido.save
               end
             end
@@ -60,7 +59,7 @@ class Pedido < ActiveRecord::Base
         if pedido.fechaLimite<DateTime.now()
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
-          pedido.cant_quebrada=cantidad-pedido.cant_vendida
+          pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
           pedido.save
           if pedido.cant_vendida>0
             #Vender el producto
@@ -81,20 +80,20 @@ class Pedido < ActiveRecord::Base
           # puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
           # puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
           if stockDisponibleCliente<(pedido.cantidad-pedido.cant_vendida)
-            cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido-cant_vendida)-stockDisponibleCliente)
-            if cantidadVendida>=pedido.cantidad-pedido-cant_vendida
-            pedido.enviado=true
+            cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido.cant_vendida)-stockDisponibleCliente)
+            if cantidadVendida>=pedido.cantidad-pedido.cant_vendida
+              pedido.enviado=true
             end
           pedido.cant_vendida=pedido.cant_vendida+cantidadVendida
           else
-          cantidadVendida=pedido.cantidad-pedido.cant_vendida
-          pedido.enviado=true
-          pedido.cant_vendida=pedido.cantidad
+            cantidadVendida=pedido.cantidad-pedido.cant_vendida
+            pedido.enviado=true
+            pedido.cant_vendida=pedido.cantidad
           end
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
           if cantidadVendida>0
-            ApiBodega.despacharProducto(sku, pedido.cantidad, direccion, 0, pedido.id)
+            ApiBodega.despacharProducto(sku, pedido.cantidad, pedido.direccion, 0, pedido.id)
           end
           pedido.save
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Sold Pedido with id #{pedido.id}"
