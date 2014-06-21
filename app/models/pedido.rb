@@ -59,7 +59,11 @@ class Pedido < ActiveRecord::Base
         if pedido.fechaLimite<DateTime.now()
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
-          pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
+          if pedido.cant_vendida
+            pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
+          else
+            pedido.cant_quebrada=pedido.cantidad
+          end
           pedido.save
           if pedido.cant_vendida>0
             #Vender el producto
