@@ -63,6 +63,7 @@ class Pedido < ActiveRecord::Base
             pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
           else
             pedido.cant_quebrada=pedido.cantidad
+            pedido.cant_vendida=0
           end
           pedido.save
           if pedido.cant_vendida>0
