@@ -54,15 +54,15 @@
           end
         when 6
         when 7
-        when 8 #NO FUNCIONA (error: "Grupo no registra autorización o nombre de usuario incorrecto.")
+        when 8 #FUNCIONA
           url="http://integra8.ing.puc.cl/api/pedirProducto"
           user="grupo9"
           almacenId="53571e54682f95b80b786eb9"
-          pass="5HUKt4Ltn/A3cypvmotC2swYC3Y=" #sha1 base 64
+          pass="crtwjh4J" #Sebastián Charad me la dio
           begin
             response=RestClient.post url,{:usuario=>user, :password=>pass, :almacen_id=>almacenId, :SKU=>sku, :cantidad=>cantidad-contar }
-            if not response.body.first.has_key?('error')
-              contar=contar+response.body[:cantidad]
+            if not JSON.parse(response.body).first.has_key?('error')
+              contar=contar+JSON.parse(response.body).first["cantidad"]
             end
           rescue
             Rails.logger.info "[SCHEDULE][BODEGA.PEDIRPRODUCTO]Error in conecction with group #{i}"
