@@ -22,7 +22,7 @@ every 10.minutes do
 end
 
 every 2.hours do 
-	runner "Pedido.preguntarPedidosPendientes" #revisar conexión con otros. Funciona en 1 de 3 grupos
+	runner "Pedido.preguntarPedidosPendientes" #revisar conexión con otros. Funciona en 2 de 3 grupos
 											   #revisar despacharStock de ApiBodega. Por alguna razón se cae
 end
 
