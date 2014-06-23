@@ -17,16 +17,16 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 # Learn more: http://github.com/javan/whenever
-every 10.minutes do
+every 29.minutes do
   	runner "Pedido.cargar" #ok
 end
 
-every 2.hours do 
+every 5.hours do 
 	runner "Pedido.preguntarPedidosPendientes" #revisar conexión con otros. Funciona en 2 de 3 grupos
 											   #revisar despacharStock de ApiBodega. Por alguna razón se cae
 end
 
-every 15.minutes do
+every 30.minutes do
  	runner "Bodega.enviarProducto" #ok
 end
 
@@ -47,17 +47,17 @@ every :day, :at => '4:30 am' do
 	runner "Database.accdb_to_csv" #ok
 end
 
-every 10.minutes do
+every 31.minutes do
 	#Revisa las ofertas no publicadas y hace las publicaciones respectivas
 	runner "FunctionTwitter.publicar"
 end
 
-every 5.minutes do
+every 9.minutes do
 	#Ve las ofertas que han llegado a la cola
 	runner "ApiRabbit.subscribeOfertas"
 end
 
-every 2.minutes do
+every 7.minutes do
 	#Ve las suscripciones que han llegado a la cola
 	runner "ApiRabbit.subscribeReposicion"
 end

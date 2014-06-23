@@ -5,7 +5,7 @@ include REXML
 class Pedido < ActiveRecord::Base
 
   belongs_to :venta, :class_name => "Venta", :foreign_key => 'pedido_id'
-  def self.cargar(less=900)
+  def self.cargar(less=2100)
     Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Begin at #{Time.now}"
     Net::SFTP.start('integra.ing.puc.cl','grupo9',:password=>'3045kdk') do |sftp|
       revision = (Time.now - less)
@@ -15,7 +15,7 @@ class Pedido < ActiveRecord::Base
       sftp.dir.foreach("Pedidos") do |file|
       #puts file.name
         pedidoID=file.name.split('_')[1].to_i
-        if Pedido.where(:pedidoID=>pedidoID).first()==nil
+        if Pedido.where(:pedidoID=>pedidoID).count == 0
           if file.name!=".." and file.name!="."
             if Time.at(file.attributes.mtime)>revision
               Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]SFTP processing: #{file.name}"
