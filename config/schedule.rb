@@ -26,7 +26,6 @@ every 2.hours do
 											   #revisar despacharStock de ApiBodega. Por alguna razón se cae
 end
 
-
 every 15.minutes do
  	runner "Bodega.enviarProducto" #ok
 end
@@ -43,6 +42,23 @@ every :day, :at => '11:57pm' do
   	runner "Venta.generarReportes"
 	runner "ApiBodega.reportarBPulmonDw" #ok
 end
+
 every :day, :at => '4:30 am' do
 	runner "Database.accdb_to_csv" #ok
 end
+
+every 10.minutes do
+	#Revisa las ofertas no publicadas y hace las publicaciones respectivas
+	runner "FunctionTwitter.publicar"
+end
+
+every 5.minutes do
+	#Ve las ofertas que han llegado a la cola
+	runner "ApiRabbit.subscribeOfertas"
+end
+
+every 2.minutes do
+	#Ve las suscripciones que han llegado a la cola
+	runner "ApiRabbit.subscribeReposicion"
+end
+

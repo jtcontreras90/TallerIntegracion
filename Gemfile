@@ -76,3 +76,10 @@ gem 'net-sftp'
 
 #Facilita la conexión con cualquier API
 gem 'rest-client'
+
+#RabbitMQ
+gem 'bunny'
+
+#Twitter
+gem 'googl'
+gem 'twitter'
