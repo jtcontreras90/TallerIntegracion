@@ -101,13 +101,13 @@
           # rescue
             # Rails.logger.info "[SCHEDULE][BODEGA.PEDIRPRODUCTO]Error in conecction with group #{i}"
           # end
-        when 7
+        # when 7
           # url="http:/integra7.ing.puc.cl/api/api_request"
           # user="grupo9"
           # pass="JgS9I4od03" #pass
           # almacenId="53571e54682f95b80b786eb9" 
           # begin
-            # response=RestClient.post url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad-contar }
+            # response=RestClient.get url,{:usuario=>user, :password=>pass, :almacenId=>almacenId, :sku=>sku, :cantidad=>cantidad-contar }
             # if not JSON.parse(response.body).has_key?('error')
               # contar=contar+JSON.parse(response.body)[:cantidad]
             # end
