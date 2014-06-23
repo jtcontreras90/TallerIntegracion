@@ -95,7 +95,8 @@ class Pedido < ActiveRecord::Base
           # puts "pedido.cantidad<stockDisponible: #{pedido.cantidad<stockDisponible}"
           # puts "pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente #{pedido.cantidad<[stockDisponible-reservadosTotales,0].max+reservadosCliente}"
           if stockDisponibleCliente<(pedido.cantidad-pedido.cant_vendida)
-            cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido.cant_vendida)-stockDisponibleCliente)
+            Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido.cant_vendida)-stockDisponibleCliente)
+            cantidadVendida=stockDisponibleCliente
             if cantidadVendida>=pedido.cantidad-pedido.cant_vendida
               pedido.cant_vendida=pedido.cantidad
               pedido.enviado=true
@@ -139,7 +140,7 @@ class Pedido < ActiveRecord::Base
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
           if cantidadVendida>0
-            ApiBodega.despacharProducto(sku, pedido.cantidad, pedido.direccion, 0, pedido.id)
+            ApiBodega.despacharProducto(sku, cantidadVendida, pedido.direccion, pedido.precio, pedido.id)
           end
           pedido.save
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Sold Pedido with id #{pedido.id}"
