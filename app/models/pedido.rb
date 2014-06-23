@@ -5,7 +5,7 @@ include REXML
 class Pedido < ActiveRecord::Base
 
   belongs_to :venta, :class_name => "Venta", :foreign_key => 'pedido_id'
-  def self.cargar(less=600)
+  def self.cargar(less=900)
     Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Begin at #{Time.now}"
     Net::SFTP.start('integra.ing.puc.cl','grupo9',:password=>'3045kdk') do |sftp|
       revision = (Time.now - less)
@@ -15,31 +15,33 @@ class Pedido < ActiveRecord::Base
       sftp.dir.foreach("Pedidos") do |file|
       #puts file.name
         pedidoID=file.name.split('_')[1].to_i
-        if file.name!=".." and file.name!="."
-          if Time.at(file.attributes.mtime)>revision
-            Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]SFTP processing: #{file.name}"
-            raw =sftp.download!("Pedidos/"+file.name)
-            doc = Document.new(raw)
-            fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
-            horaPedido=doc.elements['xml/Pedidos'].attributes['hora']
-            fecha=DateTime.parse(fechaPedido+" "+horaPedido).strftime('%Y-%m-%d %H:%M')
-            rut=doc.elements['xml/Pedidos/rut'].text
-            direccionID=doc.elements['xml/Pedidos/direccionId'].text.to_i
-            vtiger=Vtiger.new
-            if vtiger.direccionByRutAndDireccionId(rut,direccionID)
-              Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Pedido added from file #{file.name}"
-              fechaLimite=Date.parse(doc.elements['xml/Pedidos/fecha'].text)
-              doc.elements.each("xml/Pedidos/Pedido") do | element|
-                sku=element.elements['sku'].text.strip
-                unidad=element.elements['cantidad'].attributes['unidad']
-                cantidad=element.elements['cantidad'].text.to_f
-                direccion=vtiger.direccionByRutAndDireccionId(rut,direccionID)
-                direccion=direccion['calle']+', '+direccion['ciudad']+', '+direccion['region']
-                pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false, :direccion=>direccion, :cant_vendida=>0, :cant_quebrada=>0)
-                pedido.save
+        if Pedido.where(:pedidoID=>pedidoID).first()==nil
+          if file.name!=".." and file.name!="."
+            if Time.at(file.attributes.mtime)>revision
+              Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]SFTP processing: #{file.name}"
+              raw =sftp.download!("Pedidos/"+file.name)
+              doc = Document.new(raw)
+              fechaPedido=doc.elements['xml/Pedidos'].attributes['fecha']
+              horaPedido=doc.elements['xml/Pedidos'].attributes['hora']
+              fecha=DateTime.parse(fechaPedido+" "+horaPedido).strftime('%Y-%m-%d %H:%M')
+              rut=doc.elements['xml/Pedidos/rut'].text
+              direccionID=doc.elements['xml/Pedidos/direccionId'].text.to_i
+              vtiger=Vtiger.new
+              if vtiger.direccionByRutAndDireccionId(rut,direccionID)
+                Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]Pedido added from file #{file.name}"
+                fechaLimite=Date.parse(doc.elements['xml/Pedidos/fecha'].text)
+                doc.elements.each("xml/Pedidos/Pedido") do | element|
+                  sku=element.elements['sku'].text.strip
+                  unidad=element.elements['cantidad'].attributes['unidad']
+                  cantidad=element.elements['cantidad'].text.to_f
+                  direccion=vtiger.direccionByRutAndDireccionId(rut,direccionID)
+                  direccion=direccion['calle']+', '+direccion['ciudad']+', '+direccion['region']
+                  pedido=Pedido.new(:pedidoID=>pedidoID,:fecha => fecha,:rut=>rut,:direccionID=>direccionID,:fechaLimite=>fechaLimite,:sku=>sku,:unidad=>unidad,:cantidad=>cantidad, :enviado=>false, :quebrado=>false, :direccion=>direccion, :cant_vendida=>0, :cant_quebrada=>0)
+                  pedido.save
+                end
               end
+            vtiger.logout
             end
-          vtiger.logout
           end
         end
       end
@@ -60,21 +62,29 @@ class Pedido < ActiveRecord::Base
           Quiebre.agregar(DateTime.now,pedido.sku,pedido.rut)
           pedido.quebrado=true
           if pedido.cant_vendida
-            pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
+          pedido.cant_quebrada=pedido.cantidad-pedido.cant_vendida
           else
-            pedido.cant_quebrada=pedido.cantidad
-            pedido.cant_vendida=0
+          pedido.cant_quebrada=pedido.cantidad
+          pedido.cant_vendida=0
           end
           pedido.save
           if pedido.cant_vendida>0
             #Vender el producto
             precios=Pricing.findBySKU(sku)
             variant=Spree::Variant.where(sku: sku).first()
-            venta=Venta.new(:spree_variant_id=>variant.id,
-            :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
-            :ingreso=>precios.precio*pedido.cant_vendida,
-            :pedido_id=>pedido.id,
-            :fecha=>DateTime.now())
+            if variant==nil
+              venta=Venta.new(:spree_variant_id=>0,
+              :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
+              :ingreso=>precios.precio*pedido.cant_vendida,
+              :pedido_id=>pedido.id,
+              :fecha=>DateTime.now())
+            else
+              venta=Venta.new(:spree_variant_id=>variant.id,
+              :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
+              :ingreso=>precios.precio*pedido.cant_vendida,
+              :pedido_id=>pedido.id,
+              :fecha=>DateTime.now())
+            end
           venta.save
           end
         else
@@ -87,13 +97,13 @@ class Pedido < ActiveRecord::Base
           if stockDisponibleCliente<(pedido.cantidad-pedido.cant_vendida)
             cantidadVendida=stockDisponibleCliente+Bodega.pedirProducto(pedido.sku,(pedido.cantidad-pedido.cant_vendida)-stockDisponibleCliente)
             if cantidadVendida>=pedido.cantidad-pedido.cant_vendida
-              pedido.enviado=true
+            pedido.enviado=true
             end
           pedido.cant_vendida=pedido.cant_vendida+cantidadVendida
           else
-            cantidadVendida=pedido.cantidad-pedido.cant_vendida
-            pedido.enviado=true
-            pedido.cant_vendida=pedido.cantidad
+          cantidadVendida=pedido.cantidad-pedido.cant_vendida
+          pedido.enviado=true
+          pedido.cant_vendida=pedido.cantidad
           end
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
