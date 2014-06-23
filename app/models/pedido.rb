@@ -15,7 +15,7 @@ class Pedido < ActiveRecord::Base
       sftp.dir.foreach("Pedidos") do |file|
       #puts file.name
         pedidoID=file.name.split('_')[1].to_i
-        if Pedido.where(:pedidoID=>pedidoID).first()==nil
+        if Pedido.where(:pedidoID=>pedidoID).count == 0
           if file.name!=".." and file.name!="."
             if Time.at(file.attributes.mtime)>revision
               Rails.logger.info "[SCHEDULE][PEDIDO.CARGAR]SFTP processing: #{file.name}"
