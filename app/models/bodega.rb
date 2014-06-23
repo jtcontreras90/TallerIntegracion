@@ -101,7 +101,7 @@
           # rescue
             # Rails.logger.info "[SCHEDULE][BODEGA.PEDIRPRODUCTO]Error in conecction with group #{i}"
           # end
-        # when 7
+        when 7
           # url="http:/integra7.ing.puc.cl/api/api_request"
           # user="grupo9"
           # pass="JgS9I4od03" #pass
