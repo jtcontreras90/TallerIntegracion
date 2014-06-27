@@ -104,13 +104,13 @@ class Pedido < ActiveRecord::Base
               variant=Spree::Variant.where(sku: sku).first()
               if variant==nil
                 venta=Venta.new(:spree_variant_id=>0,
-                :utilidad=>(precios.precio-precios.costo_producto)*pedido.catidad_vendida,
+                :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
                 :ingreso=>precios.precio*pedido.cantidad,
                 :pedido_id=>pedido.id,
                 :fecha=>DateTime.now())
               else
                 venta=Venta.new(:spree_variant_id=>variant.id,
-                :utilidad=>(precios.precio-precios.costo_producto)*pedido.catidad_vendida,
+                :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
                 :ingreso=>precios.precio*pedido.cantidad,
                 :pedido_id=>pedido.id,
                 :fecha=>DateTime.now())
@@ -125,13 +125,13 @@ class Pedido < ActiveRecord::Base
             variant=Spree::Variant.where(sku: sku).first()
             if variant==nil
               venta=Venta.new(:spree_variant_id=>0,
-              :utilidad=>(precios.precio-precios.costo_producto)*pedido.catidad_vendida,
+              :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cantidad,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
             else
               venta=Venta.new(:spree_variant_id=>variant.id,
-              :utilidad=>(precios.precio-precios.costo_producto)*pedido.catidad_vendida,
+              :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cantidad,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
