@@ -53,8 +53,8 @@ class Pedido < ActiveRecord::Base
     Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Begin at #{Time.now}"
     Pedido.all.each do |pedido|
       if not pedido.enviado and not pedido.quebrado
-        precios=Pricing.findBySKU(sku)
         sku=pedido.sku.strip
+        precios=Pricing.findBySKU(sku)
         reservadosTotales=Reserva.getReservasXSKU(sku)
         reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
         stockDisponible=ApiBodega.obtenerStock(sku)
