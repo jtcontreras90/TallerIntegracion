@@ -15,7 +15,19 @@ module Spree
     def show
       return unless @product
 
-      @product.refreshStock
+      p=Product.find(@product.id)
+      p.refreshStock
+      if not session.has_key?(:seteado)
+        session[:seteado]={}
+      end
+
+      if p.tieneOferta or not session[:seteado].has_key?(p.id)
+        if p.refreshAttributes
+          session[:seteado][p.id]=true
+        end
+      end
+
+      @product=p
 
       @variants = @product.variants_including_master.active(current_currency).includes([:option_values, :images])
       @product_properties = @product.product_properties.includes(:property)
