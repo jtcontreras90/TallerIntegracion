@@ -11,7 +11,7 @@ module Spree
 			session[:seteado]={}
 		end
 		@products.each do |p|
-			if not session[:seteado].has_key?(p.id)
+			if p.tieneOferta or not session[:seteado].has_key?(p.id)
 				if p.refreshAttributes
 					session[:seteado][p.id]=true
 				end
