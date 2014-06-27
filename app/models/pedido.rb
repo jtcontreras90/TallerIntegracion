@@ -140,7 +140,7 @@ class Pedido < ActiveRecord::Base
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
           if cantidadVendida>0
-            ApiBodega.despacharProducto(sku, cantidadVendida, pedido.direccion, pedido.precio, pedido.id)
+            ApiBodega.despacharProducto(sku, cantidadVendida, pedido.direccion, precios.precio, pedido.id)
           end
           pedido.save
           Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Sold Pedido with id #{pedido.id}"
