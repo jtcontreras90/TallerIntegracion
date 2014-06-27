@@ -53,6 +53,7 @@ class Pedido < ActiveRecord::Base
     Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Begin at #{Time.now}"
     Pedido.all.each do |pedido|
       if not pedido.enviado and not pedido.quebrado
+        precios=Pricing.findBySKU(sku)
         sku=pedido.sku.strip
         reservadosTotales=Reserva.getReservasXSKU(sku)
         reservadosCliente=Reserva.getReservasXCliente(sku,pedido.rut)
@@ -70,7 +71,6 @@ class Pedido < ActiveRecord::Base
           pedido.save
           if pedido.cant_vendida>0 and not pedido.enviado
             #Vender el producto
-            precios=Pricing.findBySKU(sku)
             variant=Spree::Variant.where(sku: sku).first()
             if variant==nil
               venta=Venta.new(:spree_variant_id=>0,
@@ -100,7 +100,6 @@ class Pedido < ActiveRecord::Base
             if cantidadVendida>=pedido.cantidad-pedido.cant_vendida
               pedido.cant_vendida=pedido.cantidad
               pedido.enviado=true
-              precios=Pricing.findBySKU(sku)
               variant=Spree::Variant.where(sku: sku).first()
               if variant==nil
                 venta=Venta.new(:spree_variant_id=>0,
@@ -121,7 +120,6 @@ class Pedido < ActiveRecord::Base
             cantidadVendida=pedido.cantidad-pedido.cant_vendida
             pedido.cant_vendida=pedido.cantidad
             pedido.enviado=true
-            precios=Pricing.findBySKU(sku)
             variant=Spree::Variant.where(sku: sku).first()
             if variant==nil
               venta=Venta.new(:spree_variant_id=>0,
