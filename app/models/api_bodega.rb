@@ -125,6 +125,11 @@ class ApiBodega < ActiveRecord::Base
 		#Corresponde a los productos que pidieron otras bodegas pero que aún no se han enviado
 		yaEnviado=Transferencia.where(sku: sku, sent: false).sum(:cantidad)
 		total=total-yaEnviado
+
+		#Corresponde a los productos que se vendieron por spree pero que aún no se han enviado
+		yaEnviado=EOrder.where(sku: sku, enviado:false).sum(:cantidad)
+		total=total-yaEnviado
+		
 		if total < 0
 			total=0
 		end

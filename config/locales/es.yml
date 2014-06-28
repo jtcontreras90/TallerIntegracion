@@ -997,8 +997,8 @@ es:
     stock_transfers: Stock Transfers
     stop: Stop
     store: Store
-    street_address: Street Address
-    street_address_2: Street Address (cont'd)
+    street_address: Calle
+    street_address_2: Comuna
     subtotal: Subtotal
     subtract: Subtract
     success: Success
