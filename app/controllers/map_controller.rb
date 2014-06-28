@@ -4,7 +4,7 @@ class MapController < ApplicationController
 		@paquetesPedidos=[]
 		vtiger=Vtiger.new
 		@h=Pedido.all.map{|x| x.pedidoID}.uniq.count
-		Pedido.order('created_at desc').map{|x| x.pedidoID}.uniq[0,10].each do |p|
+		Pedido.order('created_at desc').map{|x| x.pedidoID}.uniq[params[:offset],10].each do |p|
 			a={}
 			b=[]
 			parcial = false
@@ -12,9 +12,10 @@ class MapController < ApplicationController
 				if i==0
 					a['color']="green"
 					a['nombreCliente']=pedido.rut
-					dir=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
-					a['direccion_detail']=dir
-					a['direccion']="#{dir["calle"]}, #{dir["ciudad"]}, #{dir["region"]} "
+					# dir=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
+					# a['direccion_detail']=dir
+					# a['direccion']="#{dir["calle"]}, #{dir["ciudad"]}, #{dir["region"]} "
+					a['direccion']=pedido.direccion
 					
 				end
 				c={}
