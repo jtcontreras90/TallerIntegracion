@@ -4,6 +4,8 @@ require 'json'
 Spree::Admin::ReportsController.class_eval do
     ADVANCED_REPORTS ||= {}
     
+      Spree::Admin::ReportsController.add_available_report!(:tweets,"Tweets de la compañía")
+      Spree::Admin::ReportsController.add_available_report!(:mapa,"Mapa de pedidos")
       Spree::Admin::ReportsController.add_available_report!(:ingresos,"Ingresos")
       Spree::Admin::ReportsController.add_available_report!(:ganancias,"Ganancias")
       Spree::Admin::ReportsController.add_available_report!(:productos_top,"Productos Top")
@@ -11,7 +13,9 @@ Spree::Admin::ReportsController.class_eval do
       Spree::Admin::ReportsController.add_available_report!(:transacciones,"Transacciones")
       Spree::Admin::ReportsController.add_available_report!(:quiebres_stock,"Quiebres de Stock")
       Spree::Admin::ReportsController.add_available_report!(:bodega_pulmon,"Costo Bodega Pulmón")
-      Spree::Admin::ReportsController.add_available_report!(:mapa,"Mapa de pedidos")
+
+      def tweets
+      end
 
       def map
         pedidoID=nil

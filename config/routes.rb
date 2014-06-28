@@ -20,6 +20,7 @@ TallerIntegracion::Application.routes.draw do
     match '/admin/reports/quiebres_stock' => 'admin/reports#quiebres_stock', :via => [:get, :post], :as =>'quiebres_stock_admin_reports'
     get '/admin/reports/map/:offset' => 'admin/reports#map', :as => 'map'
     get '/admin/reports/map'  => redirect("/admin/reports/map/0"), :as => 'mapa_admin_reports'
+    match '/admin/reports/tweets' => 'admin/reports#tweets', :via => [:get, :post], :as =>'tweets_admin_reports'
   end
 
   scope :path => "/api" do
