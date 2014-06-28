@@ -62,7 +62,7 @@ every 7.minutes do
 	runner "ApiRabbit.subscribeReposicion"
 end
 
-every 15.seconds do
+every 1.minute do
 	#Revisa las Spree::Orders a ver si se ha comprado algo nuevo
 	runner "EOrder.readOrders"
 end 
