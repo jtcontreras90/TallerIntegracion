@@ -18,7 +18,6 @@ class EOrder < ActiveRecord::Base
 				eo.enviado=false
 				eo.order_id=o.id
 				eo.save
-			end
 			o.payment_state="paid"
 			o.shipment_state="ready"
 			o.approver_id=1
