@@ -28,6 +28,7 @@ Spree::Admin::ReportsController.class_eval do
                 a['color']="green"
                 a['nombreCliente']=pedido.rut
                 a['direccion']=pedido.direccion
+                a['fechaLimite']=pedido.fechaLimite.strftime('%d/%m/%Y')
                 
               end
               c={}
