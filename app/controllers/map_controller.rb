@@ -8,7 +8,7 @@ class MapController < ApplicationController
 			a={}
 			b=[]
 			parcial = false
-			Pedido.where(pedidoID: p.pedidoID).each_with_index do |pedido,i|
+			Pedido.where(pedidoID: p).each_with_index do |pedido,i|
 				if i==0
 					a['color']="green"
 					a['nombreCliente']=pedido.rut
