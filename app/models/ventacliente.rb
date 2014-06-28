@@ -27,7 +27,6 @@ class Ventacliente
 	##mayor_a y menor_a: mayor y menor valor del rango respectivamente
 	##igual1 e igual2: true si es mayor/menor igual flase si es desigualdad estricta
 	def self.query_attr_rango(var, mayor_a, igual1,menor_a, igual2)
-
 		case var 
 		
 		when 'utilidades'
@@ -89,7 +88,6 @@ class Ventacliente
 	##[:min] : mínimo del atributo entregado(var) en las tuplas dentro del rango
 	##[:max] : máximo del atributo entregado(var) en las tuplas dentro del rango
 	def self.aggr_attr(query, var)
-
 		case var 
 		
 		when 'utilidades'

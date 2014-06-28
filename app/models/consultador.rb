@@ -44,9 +44,11 @@ class Consultador
 		puts 'ahora'
 		cant = 10
 		if op!='top'
-			query = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, nom => {operacion=>att} } },{"$sort" => {nom => -1}}])			
+			query = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, nom => {operacion=>att} } },{"$sort" => {nom => -1}}])
+			#query = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, nom => {operacion=>att} } },{"$sort" => {nom => -1}}])			
 		else
-			query1 = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, "count"=>{"$sum"=>1} } }, {"$sort" => {"count"=> -1}},{"$limit" => var}])	
+			#query1 = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, "count"=>{"$sum"=>1} } }, {"$sort" => {"count"=> -1}},{"$limit" => var}])	
+			query1 = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, "count"=>{"$sum"=>1} } }, {"$sort" => {"count"=> -1}},{"$limit" => var}])
 			if quiebre
 				id = '$rut_cliente'
 				query2 = obj.collection.aggregate([{"$match" => {:fecha => {"$gte" => mayor_a, "$lte" => menor_a}}},{ "$group" => { "_id" => id, "count"=>{"$sum"=>1} } }, {"$sort" => {"count"=> -1}},{"$limit" => var}])	

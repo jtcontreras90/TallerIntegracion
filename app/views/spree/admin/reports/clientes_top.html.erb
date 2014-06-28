@@ -15,7 +15,7 @@
 	</tr>
 <% @q.each do |c| %>
 	<tr>
-		<td><%= c._id%></td>
-		<td><%= c.count%></td>
+		<td><%= c["_id"]%></td>
+		<td><%= c["count"]%></td>
 	</tr>
 <% end %>

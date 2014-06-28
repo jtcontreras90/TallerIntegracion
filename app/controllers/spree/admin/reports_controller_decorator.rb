@@ -64,20 +64,20 @@ Spree::Admin::ReportsController.class_eval do
          hoy=DateTime.now
          date1 = hoy - hoy.day.days
          date2 = hoy
-         @q=Consultador.agg_attr_sku(Ventaproducto, 'sum', 'ingresos', date1, date2)
-         @qq=Consultador.agg_attr_sku(Ventacliente, 'sum', 'ingresos', date1, date2)
+         # @q=Consultador.agg_attr_sku(Ventaproducto, 'top', 10, date1, date2)
+         @qq=Consultador.agg_attr_sku(Ventacliente, 'top', 10, date1, date2)
          @qqq=Consultador.total(Ventacliente,'ingresos',date1, date2)
-         @skuProductos=[]
-         @ingresosProductos=[]
-         @q.each do |c|
-          @skuProductos.append(c._id)
-          @ingresosProductos.append(c.sum_ingresos)
-         end
+         # @skuProductos=[]
+         # @ingresosProductos=[]
+         # @q.each do |c|
+          # @skuProductos.append(c["_id"])
+          # @ingresosProductos.append(c["sum_ingresos"])
+         # end
          @idClientes=[]
-         @ingresosClientes=[]
+         datosClientes=[]
          @qq.each do |c|
-          @idClientes.append(c._id)
-          @ingresosClientes.append(c.sum_ingresos)
+          @idClientes.append(c["_id"])
+          datosClientes.append({:y=>c["count"] })
          end
          ingresosCLientesAnual=[]
          @months=[]
@@ -92,56 +92,50 @@ Spree::Admin::ReportsController.class_eval do
            ingresosCLientesAnual.append(c[:sum])
          end
          
-         gananciasCLientesAnual=Venta.select(:ingreso)
-         ganancias=gananciasCLientesAnual.collect{|g| g.ingreso}.to_json
+         ingresos=[]
+         Venta.all.order("fecha").each do |g|
+            ingresos.append(:y=>g.ingreso, :x=>g.fecha.to_i*1000)
+         end
          @idClientes=@idClientes.to_json
-         @ingresosClientes=@ingresosClientes.to_json
+         @ingresosClientes=[{:data=>datosClientes}].to_json
          @skuProductos=@skuProductos.to_json
          @ingresosProductos=@ingresosProductos.to_json
          @months=@months.to_json
-         @series=[{:name=>"Ingresos Diarios", :data=>gananciasCLientesAnual, :pointStart=> 1.year.ago.to_i*1000, :pointInterval=> 24 * 3600 * 1000}].to_json
+         @series=[{:name=>"Ingresos Diarios", :data=>ingresos, :pointStart=> 1.year.ago.to_i*1000, :pointInterval=> 24 * 3600 * 1000}].to_json
       end
       
       def ganancias
          hoy=DateTime.now
          date1 = hoy - hoy.day.days
          date2 = hoy
-         @q=Consultador.agg_attr_sku(Ventaproducto, 'sum', 'utilidades', date1,date2)
-         @qq=Consultador.agg_attr_sku(Ventacliente, 'sum', 'utilidades', date1,date2)
+         # @q=Consultador.agg_attr_sku(Ventaproducto, 'top', 10, date1,date2)
+         @qq=Consultador.agg_attr_sku(Ventacliente, 'top', 10, date1,date2)
          @qqq=Consultador.total(Ventacliente,'utilidades',date1,date2)
          @skuProductos=[]
          @gananciasProductos=[]
-         @q.each do |c|
-          @skuProductos.append(c._id)
-          @gananciasProductos.append(c.sum_utilidades)
-         end
+         # @q.each do |c|
+          # @skuProductos.append(c["_id"])
+          # @gananciasProductos.append(c["sum_utilidades"])
+         # end
          @idClientes=[]
-         @gananciasClientes=[]
+         datosClientes=[]
          @qq.each do |c|
-          @idClientes.append(c._id)
-          @gananciasClientes.append(c.sum_utilidades)
+          @idClientes.append(c["_id"])
+          datosClientes.append({:y=>c["count"] })
          end
-         gananciasCLientesAnual=[]
          @months=[]
          I18n.default_locale = :es
          hoy=DateTime.now
-         gananciasCLientesAnual.append(Consultador.total(Ventacliente,'utilidades',hoy-hoy.day.days, hoy))
-         @months.append(I18n.l Date.today-(11).months, :format => "%b")
-         for i in 2..12
-           @months.append(I18n.l Date.today-(12-i).months, :format => "%b")
-           date3=hoy-(i-1).months-hoy.day.days
-           date4=hoy-i.months-hoy.day.days
-           c=Consultador.total(Ventacliente,'utilidades',date3, date4)
-           gananciasCLientesAnual.append(c[:sum])
+         ganancias=[]
+         Venta.all.order("fecha").each do |g|
+            ganancias.append(:y=>g.utilidad, :x=>g.fecha.to_i*1000)
          end
-         gananciasCLientesAnual=Venta.select(:utilidad)
-         ganancias=gananciasCLientesAnual.collect{|g| g.utilidad}.to_json
          @idClientes=@idClientes.to_json
-         @ingresosClientes=@ingresosClientes.to_json
+         @gananciasClientes=[{:data=>datosClientes}].to_json
          @skuProductos=@skuProductos.to_json
          @ingresosProductos=@ingresosProductos.to_json
          @months=@months.to_json
-         @series=[{:name=>"Ganancias Diarias", :data=>gananciasCLientesAnual, :pointStart=> 1.year.ago.to_i*1000, :pointInterval=> 24 * 3600 * 1000}].to_json
+         @series=[{:name=>"Ganancias Diarias", :data=>ganancias, :pointStart=> Venta.order("fecha").first.fecha.to_i*1000}].to_json
       end
       
       def productos_top
@@ -150,7 +144,7 @@ Spree::Admin::ReportsController.class_eval do
          date2 = hoy
          cant=10
 
-         @q=Consultador.agg_attr_sku(Ventaproducto, 'top', cant, date1, date2)
+         # @q=Consultador.agg_attr_sku(Ventaproducto, 'top', cant, date1, date2)
       end
       def clientes_top
          hoy = DateTime.now
@@ -165,16 +159,16 @@ Spree::Admin::ReportsController.class_eval do
          date1 = hoy - hoy.day.days
          date2 = hoy
          pedidos=[]
-         Pedido.all.order("fecha").each do |p|
+         Pedido.all.order("created_at").each do |p|
            if p.enviado
-             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0066FF')
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0066FF', :x=>p.created_at.to_i*1000)
            elsif p.quebrado
-             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#FFFF00')
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#FFFF00', :x=>p.created_at.to_i*1000)
            else
-             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0000FF')
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0000FF', :x=>p.created_at.to_i*1000)
            end
          end
-         @series=[{:name=>"Ganancias Diarias", :data=>pedidos, :pointStart=> Pedido.all.order("fecha").first.created_at.to_i*1000}].to_json
+         @series=[{:name=>"Ganancias Diarias", :data=>pedidos, :pointStart=> Pedido.all.order("created_at").first.created_at.to_i*1000}].to_json
          @q=Consultador.total(Ventacliente,'sku',date1,date2)
          @total = @q[:count]
 

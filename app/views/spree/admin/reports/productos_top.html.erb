@@ -7,15 +7,3 @@
 <%end%>
 
 
-<h1>Productos que más se han comprado en el último mes</h1>
-<table>
-	<tr>
-		<th>SKU</th>
-		<th>Cantidad Comprada</th>
-	</tr>
-<% @q.each do |c| %>
-	<tr>
-		<td><%= c._id%></td>
-		<td><%= c.count%></td>
-	</tr>
-<% end %>
