@@ -10,7 +10,7 @@
 
 <style>
   html, body, #map-canvas {
-    height: 1000px;
+    height: 400px;
     width: 100%;
     margin: 0px;
     padding: 0px
@@ -58,7 +58,8 @@
         var infowindow = new google.maps.InfoWindow({
         content: "Cliente: " + json.nombreCliente + "<br />"
                 + "Direccion: " + json.direccion + "<br />"
-                + "Info Pedido: " + "<br />"
+                + "Fecha Limite:" + json.fecha_limite + "<br>" 
+                + "Información del Pedido: " + "<br />"
                 + tabla
         });
         //Inicializar el marcador

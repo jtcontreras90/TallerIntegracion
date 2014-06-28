@@ -14,7 +14,7 @@ class MapController < ApplicationController
 						a['color']="green"
 						a['nombreCliente']=pedido.rut
 						a['direccion']=pedido.direccion
-						
+						a['fecha_limite']=pedido.fechaLimite.strftime('%d/%m/%Y')
 					end
 					c={}
 					c['cantidadSolicitada']=pedido.cantidad
