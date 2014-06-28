@@ -4,7 +4,7 @@ class MapController < ApplicationController
 		@paquetesPedidos=[]
 		vtiger=Vtiger.new
 		@h=Pedido.all.map{|x| x.pedidoID}.uniq.count
-		Pedido.order('created_at desc').map{|x| x.pedidoID}.uniq[params[:offset],10].each do |p|
+		Pedido.order('created_at desc').map{|x| x.pedidoID}.uniq[params[:offset].to_i,10].each do |p|
 			a={}
 			b=[]
 			parcial = false
