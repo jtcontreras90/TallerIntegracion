@@ -1,11 +1,58 @@
 <%content_for :page_title do%>
 	Transacciones
 <%end%>
-
+<%= javascript_include_tag "highstock.js"%>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <%content_for :page_actions do%>
 	<li><%link_to_with_icon 'icon-arrow-left', Spree.t(:back_to_reports_list), spree.admin_reports_url, :class=>'button'%></li>
 <%end%>
+<script>
 
 
+$(function () {
+        window.chart = new Highcharts.StockChart({
+            chart: {
+            	renderTo : 'container',
+                zoomType: 'x'
+            },
+            tooltip: {
+                formatter: function() {return ' ' +
+                'Vendido: ' + this.points[0].point.vendido + '<br />' +
+                'Quebrado: ' + this.points[0].point.quebrado + '<br />';
+            },
+                shared: true,
+                crosshairs: true,
+           },
+            title: {
+                text: 'Transacciones'
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '$'
+                }
+            },
+            
+            rangeSelector: {
+            	buttons: [ {
+            	type: 'all',
+            	text: 'Reset'
+            	}],
+                enabled: true,
+                inputEnabled:false,
+            	inputDateFormat: '%d/%m/%Y',
+            	inputEditDateFormat: '%d/%m/%Y',
+            	
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: <%=raw @series%>            
+        });
+     });
+</script>
 <h1>Trasacciones realizadas el último mes</h1>
 <h2><%= @total %></h2>

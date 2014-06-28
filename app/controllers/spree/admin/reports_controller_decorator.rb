@@ -42,12 +42,15 @@ Spree::Admin::ReportsController.class_eval do
            c=Consultador.total(Ventacliente,'ingresos',date3, date4)
            ingresosCLientesAnual.append(c[:sum])
          end
+         
+         gananciasCLientesAnual=Venta.select(:ingreso)
+         ganancias=gananciasCLientesAnual.collect{|g| g.ingreso}.to_json
          @idClientes=@idClientes.to_json
          @ingresosClientes=@ingresosClientes.to_json
          @skuProductos=@skuProductos.to_json
          @ingresosProductos=@ingresosProductos.to_json
          @months=@months.to_json
-         @series=[{:name=>"Ingresos Mensuales", :data=>ingresosCLientesAnual}].to_json
+         @series=[{:name=>"Ingresos Diarios", :data=>gananciasCLientesAnual, :pointStart=> 1.year.ago.to_i*1000, :pointInterval=> 24 * 3600 * 1000}].to_json
       end
       
       def ganancias
@@ -82,12 +85,14 @@ Spree::Admin::ReportsController.class_eval do
            c=Consultador.total(Ventacliente,'utilidades',date3, date4)
            gananciasCLientesAnual.append(c[:sum])
          end
+         gananciasCLientesAnual=Venta.select(:utilidad)
+         ganancias=gananciasCLientesAnual.collect{|g| g.utilidad}.to_json
          @idClientes=@idClientes.to_json
          @ingresosClientes=@ingresosClientes.to_json
          @skuProductos=@skuProductos.to_json
          @ingresosProductos=@ingresosProductos.to_json
          @months=@months.to_json
-         @series=[{:name=>"Ganancias Mensuales", :data=>gananciasCLientesAnual}].to_json
+         @series=[{:name=>"Ganancias Diarias", :data=>gananciasCLientesAnual, :pointStart=> 1.year.ago.to_i*1000, :pointInterval=> 24 * 3600 * 1000}].to_json
       end
       
       def productos_top
@@ -110,7 +115,17 @@ Spree::Admin::ReportsController.class_eval do
          hoy = DateTime.now         
          date1 = hoy - hoy.day.days
          date2 = hoy
-
+         pedidos=[]
+         Pedido.all.order("fecha").each do |p|
+           if p.enviado
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0066FF')
+           elsif p.quebrado
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#FFFF00')
+           else
+             pedidos.append(:y=>p.cantidad,:quebrado=>p.cant_quebrada,:vendido=>p.cant_vendida,:color=>'#0000FF')
+           end
+         end
+         @series=[{:name=>"Ganancias Diarias", :data=>pedidos, :pointStart=> Pedido.all.order("fecha").first.created_at.to_i*1000}].to_json
          @q=Consultador.total(Ventacliente,'sku',date1,date2)
          @total = @q[:count]
 
