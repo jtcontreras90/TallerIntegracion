@@ -83,9 +83,6 @@ function codeAddress(jsonobject) {
     }
   }
   );
-
-  if(error)
-    alert("Algunos puntos no se pudieron cargar");
 }
 
 //Crea una tabla html con los datos de un pedido (para mostrarse en el marcador correspondiente)
@@ -111,9 +108,14 @@ function parseTable(json){
 }
 
 $(
-  $('#next').click(function(){
-    window.location="<%= mapa_path(offset: params[:offset].to_i+10) %>"
-  })
+  function(){
+    $('#next').click(function(){
+      window.location="<%= mapa_path(offset: params[:offset].to_i+10) %>"
+    })
+
+    if(error)
+      alert("Algunos puntos no se pudieron cargar");
+  }
 )
 
 google.maps.event.addDomListener(window, 'load', initialize);

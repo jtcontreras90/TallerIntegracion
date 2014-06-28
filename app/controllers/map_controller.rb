@@ -11,9 +11,6 @@ class MapController < ApplicationController
 				if i==0
 					a['color']="green"
 					a['nombreCliente']=pedido.rut
-					# dir=vtiger.direccionByRutAndDireccionId(pedido.rut,pedido.direccionID)
-					# a['direccion_detail']=dir
-					# a['direccion']="#{dir["calle"]}, #{dir["ciudad"]}, #{dir["region"]} "
 					a['direccion']=pedido.direccion
 					
 				end
@@ -39,17 +36,5 @@ class MapController < ApplicationController
 			@paquetesPedidos<<a
 		end
 		@paquetesPedidos
-
-
-
-		# Pedido.order("pedidoID").each do |pedido|
-		# 	if not pedido.pedidoID==pedidoID
-		# 		@paquetesPedidos.append(@paquetePedido)
-		# 		@paquetePedido=[]
-		# 		pedidoID=pedido.pedidoID
-		# 	end
-		# 	@paquetePedido.append(pedido)
-		# end
-		# @paquetesPedidos = @paquetesPedidos.to_json
 	end
 end
