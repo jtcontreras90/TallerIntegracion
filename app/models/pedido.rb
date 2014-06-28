@@ -73,19 +73,18 @@ class Pedido < ActiveRecord::Base
             #Vender el producto
             variant=Spree::Variant.where(sku: sku).first()
             if variant==nil
-              venta=Venta.new(:spree_variant_id=>0,
+              venta=Venta.create(:spree_variant_id=>0,
               :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cant_vendida,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
             else
-              venta=Venta.new(:spree_variant_id=>variant.id,
+              venta=Venta.create(:spree_variant_id=>variant.id,
               :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cant_vendida,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
             end
-          venta.save
           end
         else
           puts "Sku: #{pedido.sku}"
@@ -102,13 +101,13 @@ class Pedido < ActiveRecord::Base
               pedido.enviado=true
               variant=Spree::Variant.where(sku: sku).first()
               if variant==nil
-                venta=Venta.new(:spree_variant_id=>0,
+                venta=Venta.create(:spree_variant_id=>0,
                 :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
                 :ingreso=>precios.precio*pedido.cantidad,
                 :pedido_id=>pedido.id,
                 :fecha=>DateTime.now())
               else
-                venta=Venta.new(:spree_variant_id=>variant.id,
+                venta=Venta.create(:spree_variant_id=>variant.id,
                 :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
                 :ingreso=>precios.precio*pedido.cantidad,
                 :pedido_id=>pedido.id,
@@ -122,26 +121,26 @@ class Pedido < ActiveRecord::Base
             pedido.enviado=true
             variant=Spree::Variant.where(sku: sku).first()
             if variant==nil
-              venta=Venta.new(:spree_variant_id=>0,
+              venta=Venta.create(:spree_variant_id=>0,
               :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cantidad,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
             else
-              venta=Venta.new(:spree_variant_id=>variant.id,
+              venta=Venta.create(:spree_variant_id=>variant.id,
               :utilidad=>(precios.precio-precios.costo_producto)*pedido.cant_vendida,
               :ingreso=>precios.precio*pedido.cantidad,
               :pedido_id=>pedido.id,
               :fecha=>DateTime.now())
             end
           end
-          Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.id}"
+          Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Processing Pedido with id #{pedido.pedidoID}"
           Reserva.quitarReservasXCliente(sku,pedido.rut,[cantidadVendida,reservadosCliente].min)
           if cantidadVendida>0
-            ApiBodega.despacharProducto(sku, cantidadVendida, pedido.direccion, precios.precio, pedido.id)
+            ApiBodega.despacharProducto(sku, cantidadVendida, pedido.direccion, precios.precio, pedido.pedidoID)
           end
           pedido.save
-          Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Sold Pedido with id #{pedido.id}"
+          Rails.logger.info "[SCHEDULE][PEDIDO.PREGUNTARPEDIDOSPENDIENTES]Sold Pedido with id #{pedido.pedidoID}"
         end
       end
     end
