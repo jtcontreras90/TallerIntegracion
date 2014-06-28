@@ -79,7 +79,7 @@ function codeAddress(jsonobject) {
       var url = s1.concat(s2,s3);
       marker.setIcon(url)
     } else {
-      error=true;
+      $('#error').html('No se pudieron cargar algunos puntos')
     }
   }
   );
@@ -112,9 +112,6 @@ $(
     $('#next').click(function(){
       window.location="<%= mapa_path(offset: params[:offset].to_i+10) %>"
     })
-
-    if(error)
-      alert("Algunos puntos no se pudieron cargar");
   }
 )
 
@@ -123,7 +120,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 </head>
 <body>
-    <button id="next">Anteriores 10</button>
+<div> <button id="next">Anteriores 10</button><div id="error"></div></div>
     <div id="map-canvas"></div>
 </body>
 </html>
