@@ -1,6 +1,6 @@
 class EOrder < ActiveRecord::Base
 
-	def readOrders
+	def self.readOrders
     	Rails.logger.info "[SCHEDULE][EORDER.READORDERS]Begin at #{Time.now}"
 		orders=Spree::Order.where('state=? AND payment_state != ?', "complete", "paid")
 		orders.each do |o|
@@ -35,7 +35,7 @@ class EOrder < ActiveRecord::Base
 	end
 
 
-	def sendOrders
+	def self.sendOrders
     	Rails.logger.info "[SCHEDULE][EORDER.SENDORDERS]Begin at #{Time.now}"
 
 		ecommerceOrders=EOrder.where(enviado: false)
