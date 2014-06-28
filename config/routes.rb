@@ -5,7 +5,6 @@ TallerIntegracion::Application.routes.draw do
   # If you would like to change where this engine is mounted, simply change the :at option to something different.
   #
   # We ask that you don't use the :as option here, as Spree relies on it being the default of "spree"
-  get '/map/maps' => 'map#maps'
   mount Spree::Core::Engine, :at => '/'
   Spree::Core::Engine.routes.draw do
 
@@ -19,6 +18,9 @@ TallerIntegracion::Application.routes.draw do
     match '/admin/reports/clientes_top' => 'admin/reports#clientes_top', :via => [:get, :post], :as =>'clientes_top_admin_reports'
     match '/admin/reports/transacciones' => 'admin/reports#transacciones', :via => [:get, :post], :as =>'transacciones_admin_reports'
     match '/admin/reports/quiebres_stock' => 'admin/reports#quiebres_stock', :via => [:get, :post], :as =>'quiebres_stock_admin_reports'
+    get '/admin/reports/map/:offset' => 'admin/reports#map', :as => 'map'
+    get '/admin/reports/map'  => redirect("/admin/reports/map/0"), :as => 'mapa_admin_reports'
+    match '/admin/reports/tweets' => 'admin/reports#tweets', :via => [:get, :post], :as =>'tweets_admin_reports'
   end
 
   scope :path => "/api" do
