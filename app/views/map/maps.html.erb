@@ -53,6 +53,8 @@ function codeAddress(jsonobject) {
 
   geocoder.geocode( { 'address': address}, function(results, status) {
 
+    error=false;
+
     if (status == google.maps.GeocoderStatus.OK) {
       map.setCenter(results[0].geometry.location);
       //Ventana a desplegarse cuando se hace click en el marcador
@@ -78,9 +80,11 @@ function codeAddress(jsonobject) {
       var url = s1.concat(s2,s3);
       marker.setIcon(url)
     } else {
-      alert('Geocode was not successful for the following reason: ' + status);
+      error=true;
     }
-  });
+  }
+  console.log(error);
+  );
 }
 //Crea una tabla html con los datos de un pedido (para mostrarse en el marcador correspondiente)
 function parseTable(json){

@@ -20,19 +20,21 @@ class MapController < ApplicationController
 				end
 				c={}
 				c['cantidadSolicitada']=pedido.cantidad
-				c['cantidadEnviada']=0
+				c['cantidadEnviada']=pedido.cant_vendida
 				c['sku']= pedido.sku
 				c['quiebre']=pedido.quebrado
 				b<<c
 				if pedido.quebrado
-					a['color']="yellow"
+					a['color']="red"
 				else
 					parcial = true
 				end
 
-			end
-			if parcial == false
-				a['color']='red'
+				if pedido.cantidad > pedido.cant_vendida
+					a['color']="yellow"
+
+				end
+
 			end
 			a['pedido']=b
 			@paquetesPedidos<<a
